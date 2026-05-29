@@ -14,6 +14,9 @@ const schema = z.object({
   OPENROUTER_API_KEY: z.string().min(1),
   OPENROUTER_MODEL: z.string().default("anthropic/claude-3.5-sonnet"),
   FIRECRAWL_API_KEY: z.string().min(1),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
 });
 
 const parsed = schema.safeParse(process.env);

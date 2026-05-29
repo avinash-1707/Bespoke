@@ -3,10 +3,14 @@ import {
   createRedisConnection,
   JOB_NAME,
   QUEUE_NAME,
+  type ConsolidateInsightsPayload,
   type ScrapeOfferingSourcePayload,
+  type ScrapeProspectAssetPayload,
 } from "@bespoke/queue";
 import { config } from "./config";
 import { scrapeOfferingSource } from "./processors/scrape-offering-source";
+import { scrapeProspectAsset } from "./processors/scrape-prospect-asset";
+import { consolidateInsights } from "./processors/consolidate-insights";
 
 /**
  * Worker bootstrap. Spins up one BullMQ Worker per queue sharing a single
@@ -25,6 +29,10 @@ const scrapeProcessor: Processor = async (job) => {
   switch (job.name) {
     case JOB_NAME.scrapeOfferingSource:
       return scrapeOfferingSource(job as Job<ScrapeOfferingSourcePayload>);
+    case JOB_NAME.scrapeProspectAsset:
+      return scrapeProspectAsset(job as Job<ScrapeProspectAssetPayload>);
+    case JOB_NAME.consolidateInsights:
+      return consolidateInsights(job as Job<ConsolidateInsightsPayload>);
     default:
       return notImplemented(job);
   }

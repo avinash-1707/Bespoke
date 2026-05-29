@@ -1,3 +1,4 @@
 export * from "./constants/index";
 export * from "./types/index";
 export * from "./offering";
+export * from "./prospect";

@@ -80,6 +80,7 @@ Versions pinned to latest stable as of May 2026.
 | Auth         | Better Auth                                             | `1.6.x`             |
 | AI           | OpenRouter via Vercel AI SDK (`ai` + provider)          | `6.x` / `2.9.x`     |
 | Scraping     | Firecrawl (`@mendable/firecrawl-js`)                    | `4.22.x`            |
+| File storage | Cloudinary (`cloudinary`) — backend-signed upload       | `2.x`               |
 
 ---
 
@@ -143,6 +144,36 @@ enqueues `scrape-prospect-asset` → worker scrapes/vision-reads, writes a
 prospect are done, enqueues `consolidate-insights` → that merges every insight
 into `prospect_context`, ready for generation.
 
+### Screenshot uploads (Cloudinary signed, browser-direct)
+
+LinkedIn screenshots never pass through the API. The browser uploads them
+directly to Cloudinary using a short-lived signature the API issues:
+
+```
+┌──────────┐  1. POST /api/uploads/sign   ┌──────────┐
+│   web    │ ───────────────────────────▶ │   api    │  signs {timestamp, folder}
+│ (browser)│ ◀─────────────────────────── │ Fastify  │  with CLOUDINARY_API_SECRET
+└────┬─────┘   {signature, apiKey, …}      └──────────┘  (secret never leaves server)
+     │ 2. POST file + signature (multipart, no auth cookie)
+     ▼
+┌────────────┐  3. {public_id, secure_url}
+│ Cloudinary │ ──────────────────────────▶ web then 4. POST /api/prospects/:id/assets
+└────────────┘                                { assetType: linkedin_screenshot, fileKey: public_id }
+```
+
+1. **Sign** — `POST /api/uploads/sign` (auth required) returns
+   `{ timestamp, signature, apiKey, cloudName, folder }`. The API signs the
+   exact `timestamp` + `folder` Cloudinary will receive; the API secret stays
+   server-side and the bytes never touch the API.
+2. **Upload** — the browser POSTs the file plus the signed params straight to
+   Cloudinary (`credentials: "omit"` — different origin, no session cookie).
+3. **Attach** — Cloudinary returns the `public_id`, which the web app passes as
+   `file_key` to `POST /api/prospects/:id/assets`, enqueuing the usual
+   `scrape-prospect-asset` job.
+4. **Vision read** — the worker rebuilds the delivery URL from
+   `CLOUDINARY_CLOUD_NAME` + `public_id` and runs vision extraction (AI SDK
+   image message) to produce the `prospect_insights` row.
+
 ---
 
 ## Project structure
@@ -178,7 +209,7 @@ bespoke/
 - Node.js `>=24` and pnpm `>=11`
 - A PostgreSQL `18.x` database (local or hosted)
 - An Upstash Redis database (use the **TCP** `rediss://` connection string)
-- API keys: OpenRouter, Firecrawl
+- API keys: OpenRouter, Firecrawl, Cloudinary (cloud name + key + secret)
 
 ### Setup
 
@@ -221,6 +252,9 @@ Zod-validated `config.ts` — `process.env` is never accessed directly elsewhere
 | `OPENROUTER_API_KEY`    | worker           | OpenRouter key (the only AI key needed)        |
 | `OPENROUTER_MODEL`      | worker           | Default generation model slug                  |
 | `FIRECRAWL_API_KEY`     | worker           | Firecrawl scraping key                         |
+| `CLOUDINARY_CLOUD_NAME` | api, worker      | Cloudinary cloud name (signing + delivery URL) |
+| `CLOUDINARY_API_KEY`    | api              | Cloudinary API key (returned in the signature) |
+| `CLOUDINARY_API_SECRET` | api              | Cloudinary secret for signing — server-only    |
 | `NEXT_PUBLIC_API_URL`   | web              | Fastify API origin                             |
 
 > The Vercel AI SDK is a library — it needs no key of its own. Only
@@ -229,6 +263,10 @@ Zod-validated `config.ts` — `process.env` is never accessed directly elsewhere
 > Upstash must use the **TCP** endpoint with `ioredis`
 > (`maxRetriesPerRequest: null`). The serverless REST SDK (`@upstash/redis`)
 > is **not** compatible with BullMQ.
+
+> The web app needs **no** Cloudinary env — the sign endpoint returns the
+> cloud name alongside the signature, so the cloud name is never hardcoded in
+> the browser bundle.
 
 ---
 
@@ -299,6 +337,11 @@ output)
 - **OpenRouter via the Vercel AI SDK** — one typed interface, easy model
   switching, and built-in vision support for screenshot extraction, behind a
   single API key.
+- **Cloudinary signed, browser-direct uploads** — the API signs an upload and
+  the browser sends the file straight to Cloudinary, so screenshot bytes never
+  hit the API process and the API secret never leaves the server. Only the
+  returned `public_id` is stored (`prospect_assets.file_key`); the worker
+  rebuilds the delivery URL on demand for vision extraction.
 
 ---
 
@@ -312,8 +355,11 @@ output)
 - **Upstash per-command billing** — BullMQ polls continuously, so command count
   accrues even when idle. Acceptable at this scale; worker concurrency and poll
   intervals are left at defaults to keep it bounded.
-- **Local disk for uploads in dev** — screenshots are stored on disk locally
-  and on S3-compatible storage in production, keyed by `prospect_assets.file_key`.
+- **Cloudinary for screenshot storage** — a hosted image service avoids running
+  file infrastructure and gives free delivery-time transforms (the worker fetches
+  `f_auto,q_auto` for vision). Adds a third-party dependency and a signed-upload
+  round trip vs. a plain API multipart endpoint, traded for keeping file bytes
+  off the API and the secret off the client.
 
 ---
 

@@ -10,6 +10,7 @@ import { authPlugin, requireAuth } from "./plugins/auth";
 import { offeringRoutes } from "./routes/offerings/index";
 import { promptRoutes } from "./routes/prompts/index";
 import { prospectRoutes } from "./routes/prospects/index";
+import { uploadRoutes } from "./routes/uploads/index";
 
 /**
  * Fastify bootstrap. CORS is registered before the auth handler. Zod drives
@@ -51,6 +52,7 @@ async function main(): Promise<void> {
   await app.register(offeringRoutes, { prefix: "/api/offerings" });
   await app.register(promptRoutes, { prefix: "/api/prompts" });
   await app.register(prospectRoutes, { prefix: "/api/prospects" });
+  await app.register(uploadRoutes, { prefix: "/api/uploads" });
 
   try {
     await app.listen({ port: config.PORT, host: config.HOST });
