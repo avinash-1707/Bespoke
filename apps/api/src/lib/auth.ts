@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { createDatabase } from "@bespoke/db";
 import { config } from "../config";
+import { db } from "../context";
 
 /**
  * Better Auth instance — owns the auth tables (user, session, account,
@@ -11,8 +11,6 @@ import { config } from "../config";
  * This module is the source the Better Auth CLI reads to generate the Drizzle
  * schema, and the same instance the Fastify auth plugin mounts at runtime.
  */
-const db = createDatabase(config.DATABASE_URL);
-
 export const auth = betterAuth({
   appName: "Bespoke",
   baseURL: config.BETTER_AUTH_URL,

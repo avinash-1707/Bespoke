@@ -1,6 +1,12 @@
-import { Worker, type Processor } from "bullmq";
-import { createRedisConnection, QUEUE_NAME } from "@bespoke/queue";
+import { Worker, type Job, type Processor } from "bullmq";
+import {
+  createRedisConnection,
+  JOB_NAME,
+  QUEUE_NAME,
+  type ScrapeOfferingSourcePayload,
+} from "@bespoke/queue";
 import { config } from "./config";
+import { scrapeOfferingSource } from "./processors/scrape-offering-source";
 
 /**
  * Worker bootstrap. Spins up one BullMQ Worker per queue sharing a single
@@ -14,8 +20,18 @@ const notImplemented: Processor = async (job) => {
   throw new Error(`No processor registered for job "${job.name}"`);
 };
 
+/** Routes scrape-queue jobs to their processor by job name. */
+const scrapeProcessor: Processor = async (job) => {
+  switch (job.name) {
+    case JOB_NAME.scrapeOfferingSource:
+      return scrapeOfferingSource(job as Job<ScrapeOfferingSourcePayload>);
+    default:
+      return notImplemented(job);
+  }
+};
+
 const workers: Worker[] = [
-  new Worker(QUEUE_NAME.scrape, notImplemented, {
+  new Worker(QUEUE_NAME.scrape, scrapeProcessor, {
     connection,
     concurrency: 5,
   }),
