@@ -1,0 +1,67 @@
+/**
+ * Row types inferred directly from the Drizzle schema — never hand-written.
+ * `Select` is a read row; `Insert` is the shape accepted by `.insert()`.
+ * These are the canonical entity types; the web app imports them type-only.
+ */
+import type {
+  offerings,
+  offeringSources,
+  prompts,
+  prospects,
+  prospectAssets,
+  prospectInsights,
+  prospectContext,
+  conversations,
+  conversationMessages,
+  aiGenerations,
+  generatedMessages,
+  messageRatings,
+  scrapeJobs,
+  generationJobs,
+  analyticsEvents,
+} from "./schema/index";
+
+export type Offering = typeof offerings.$inferSelect;
+export type NewOffering = typeof offerings.$inferInsert;
+
+export type OfferingSource = typeof offeringSources.$inferSelect;
+export type NewOfferingSource = typeof offeringSources.$inferInsert;
+
+export type Prompt = typeof prompts.$inferSelect;
+export type NewPrompt = typeof prompts.$inferInsert;
+
+export type Prospect = typeof prospects.$inferSelect;
+export type NewProspect = typeof prospects.$inferInsert;
+
+export type ProspectAsset = typeof prospectAssets.$inferSelect;
+export type NewProspectAsset = typeof prospectAssets.$inferInsert;
+
+export type ProspectInsight = typeof prospectInsights.$inferSelect;
+export type NewProspectInsight = typeof prospectInsights.$inferInsert;
+
+export type ProspectContext = typeof prospectContext.$inferSelect;
+export type NewProspectContext = typeof prospectContext.$inferInsert;
+
+export type Conversation = typeof conversations.$inferSelect;
+export type NewConversation = typeof conversations.$inferInsert;
+
+export type ConversationMessage = typeof conversationMessages.$inferSelect;
+export type NewConversationMessage = typeof conversationMessages.$inferInsert;
+
+export type AiGeneration = typeof aiGenerations.$inferSelect;
+export type NewAiGeneration = typeof aiGenerations.$inferInsert;
+
+export type GeneratedMessage = typeof generatedMessages.$inferSelect;
+export type NewGeneratedMessage = typeof generatedMessages.$inferInsert;
+
+export type MessageRating = typeof messageRatings.$inferSelect;
+export type NewMessageRating = typeof messageRatings.$inferInsert;
+
+export type ScrapeJob = typeof scrapeJobs.$inferSelect;
+export type NewScrapeJob = typeof scrapeJobs.$inferInsert;
+
+export type GenerationJob = typeof generationJobs.$inferSelect;
+export type NewGenerationJob = typeof generationJobs.$inferInsert;
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type NewAnalyticsEvent = typeof analyticsEvents.$inferInsert;
