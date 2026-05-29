@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — single source of color truth (see context/ui-context.md).
+ * Dark-only product. No hardcoded hex anywhere else; reference these vars
+ * via Tailwind, e.g. bg-[var(--bg-surface)].
+ */
+:root {
+  color-scheme: dark;
+
+  --bg-base: #09090e;
+  --bg-surface: #111118;
+  --bg-surface-elevated: #1a1a26;
+  --bg-surface-hover: #1f1f2e;
+
+  --text-primary: #ededf0;
+  --text-secondary: #a0a0b0;
+  --text-muted: #5a5a70;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f52d9;
+  --accent-subtle: #6366f114;
+  --accent-text: #818cf8;
+
+  --border-default: #1e1e2e;
+  --border-strong: #2e2e42;
+
+  --state-error: #ef4444;
+  --state-error-subtle: #ef444414;
+  --state-success: #22c55e;
+  --state-success-subtle: #22c55e14;
+  --state-warning: #f59e0b;
+  --state-warning-subtle: #f59e0b14;
+  --state-pending: #6366f1;
+  --state-favorite: #f59e0b;
+}
+
+/* Expose tokens + next/font faces to Tailwind's utility generator. */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+
+  --color-bg-base: var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-elevated: var(--bg-surface-elevated);
+  --color-bg-surface-hover: var(--bg-surface-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent-primary);
+  --color-border-default: var(--border-default);
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}

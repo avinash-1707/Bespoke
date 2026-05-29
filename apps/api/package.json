@@ -1,0 +1,28 @@
+{
+  "name": "@bespoke/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bespoke/db": "workspace:*",
+    "@bespoke/queue": "workspace:*",
+    "@bespoke/shared": "workspace:*",
+    "@fastify/cors": "^11.0.0",
+    "better-auth": "^1.6.0",
+    "fastify": "^5.8.0",
+    "zod": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^6.0.0"
+  }
+}
