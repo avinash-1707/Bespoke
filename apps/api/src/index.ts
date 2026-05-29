@@ -1,23 +1,26 @@
 import Fastify from "fastify";
-import cors from "@fastify/cors";
 import { config } from "./config";
+import { corsPlugin } from "./plugins/cors";
+import { authPlugin, requireAuth } from "./plugins/auth";
 
 /**
- * Fastify bootstrap. Domain route plugins, the auth plugin, and the db/queue
- * plugins are registered here as they land in their respective units. For the
- * scaffold this exposes CORS and a health check so the app boots and deploys.
+ * Fastify bootstrap. CORS is registered before the auth handler. Domain route
+ * plugins register after auth as they land in their units.
  */
 async function main(): Promise<void> {
   const app = Fastify({
     logger: { level: config.NODE_ENV === "production" ? "info" : "debug" },
   });
 
-  await app.register(cors, {
-    origin: config.WEB_ORIGIN,
-    credentials: true,
-  });
+  await app.register(corsPlugin);
+  await app.register(authPlugin);
 
   app.get("/health", async () => ({ data: { status: "ok" } }));
+
+  // Verifies the session pipeline end to end; returns the authed user.
+  app.get("/api/me", { preHandler: requireAuth }, async (request) => ({
+    data: { user: request.session.user },
+  }));
 
   try {
     await app.listen({ port: config.PORT, host: config.HOST });
