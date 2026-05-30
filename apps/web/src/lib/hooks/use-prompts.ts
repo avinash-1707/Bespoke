@@ -3,7 +3,6 @@
 import {
   useInfiniteQuery,
   useMutation,
-  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -33,7 +32,6 @@ const PAGE_SIZE = 20;
 const promptKeys = {
   lists: ["prompts", "list"] as const,
   list: (q: string) => ["prompts", "list", { q }] as const,
-  options: ["prompts", "options"] as const,
   detail: (id: string) => ["prompts", id] as const,
 };
 
@@ -51,7 +49,7 @@ function optimisticPrompt(input: CreatePromptInput): Prompt {
 }
 
 /** Cursor-paginated, searchable prompt list for the Prompts tab. */
-export function usePromptsInfinite(q: string) {
+export function usePromptsInfinite(q: string, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: promptKeys.list(q),
     queryFn: ({ pageParam }) =>
@@ -60,21 +58,9 @@ export function usePromptsInfinite(q: string) {
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled,
   });
   return { ...query, items: flattenPages(query.data) };
-}
-
-/** Lightweight prompt list for selectors (generation panel). */
-export function usePromptOptions() {
-  return useQuery({
-    queryKey: promptKeys.options,
-    queryFn: async () => {
-      const page = await apiClient.get<CursorPage<Prompt>>(
-        `/api/prompts${listSearchParams({ limit: 100 })}`,
-      );
-      return page.items;
-    },
-  });
 }
 
 export function useCreatePrompt() {
@@ -92,10 +78,8 @@ export function useCreatePrompt() {
       toast.error(error.message);
     },
     onSuccess: () => toast.success("Prompt created"),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: promptKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: promptKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: promptKeys.lists }),
   });
 }
 
@@ -107,7 +91,6 @@ export function useUpdatePrompt(id: string) {
     onSuccess: () => {
       toast.success("Prompt saved");
       void queryClient.invalidateQueries({ queryKey: promptKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: promptKeys.options });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -127,10 +110,8 @@ export function useDeletePrompt() {
       toast.error(error.message);
     },
     onSuccess: () => toast.success("Prompt deleted"),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: promptKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: promptKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: promptKeys.lists }),
   });
 }
 
@@ -150,9 +131,7 @@ export function useBatchDeletePrompts() {
     },
     onSuccess: ({ deleted }) =>
       toast.success(`${deleted} prompt${deleted === 1 ? "" : "s"} deleted`),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: promptKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: promptKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: promptKeys.lists }),
   });
 }

@@ -66,7 +66,7 @@ function optimisticProspect(input: CreateProspectInput): Prospect {
 }
 
 /** Cursor-paginated prospect list (search matches name/company/email). */
-export function useProspectsInfinite(q: string) {
+export function useProspectsInfinite(q: string, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: prospectKeys.list(q),
     queryFn: ({ pageParam }) =>
@@ -75,6 +75,7 @@ export function useProspectsInfinite(q: string) {
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled,
   });
   return { ...query, items: flattenPages(query.data) };
 }

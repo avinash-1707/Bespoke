@@ -39,7 +39,6 @@ const PAGE_SIZE = 20;
 const offeringKeys = {
   lists: ["offerings", "list"] as const,
   list: (q: string) => ["offerings", "list", { q }] as const,
-  options: ["offerings", "options"] as const,
   detail: (id: string) => ["offerings", id] as const,
 };
 
@@ -63,7 +62,7 @@ function optimisticOffering(input: CreateOfferingInput): Offering {
 }
 
 /** Cursor-paginated, searchable offering list for the Offerings tab. */
-export function useOfferingsInfinite(q: string) {
+export function useOfferingsInfinite(q: string, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: offeringKeys.list(q),
     queryFn: ({ pageParam }) =>
@@ -72,21 +71,9 @@ export function useOfferingsInfinite(q: string) {
       ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled,
   });
   return { ...query, items: flattenPages(query.data) };
-}
-
-/** Lightweight, non-paginated offering list for selectors (generation panel). */
-export function useOfferingOptions() {
-  return useQuery({
-    queryKey: offeringKeys.options,
-    queryFn: async () => {
-      const page = await apiClient.get<CursorPage<Offering>>(
-        `/api/offerings${listSearchParams({ limit: 100 })}`,
-      );
-      return page.items;
-    },
-  });
 }
 
 export function useOffering(id: string) {
@@ -112,10 +99,8 @@ export function useCreateOffering() {
       toast.error(error.message);
     },
     onSuccess: () => toast.success("Offering created"),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists }),
   });
 }
 
@@ -147,10 +132,8 @@ export function useDeleteOffering() {
       toast.error(error.message);
     },
     onSuccess: () => toast.success("Offering deleted"),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists }),
   });
 }
 
@@ -172,10 +155,8 @@ export function useBatchDeleteOfferings() {
     },
     onSuccess: ({ deleted }) =>
       toast.success(`${deleted} offering${deleted === 1 ? "" : "s"} deleted`),
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists });
-      void queryClient.invalidateQueries({ queryKey: offeringKeys.options });
-    },
+    onSettled: () =>
+      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists }),
   });
 }
 

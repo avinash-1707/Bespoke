@@ -24,9 +24,32 @@ export interface CreateGenerationInput {
   angle?: string;
 }
 
+/** A single generation with its produced message (null until the worker finishes). */
+export interface GenerationDetail extends AiGeneration {
+  message: GeneratedMessage | null;
+}
+
 const generationKeys = {
   messages: (prospectId: string) => ["generations", "prospect", prospectId] as const,
+  detail: (id: string) => ["generations", "detail", id] as const,
 };
+
+/**
+ * Poll one generation by id while it is still in flight. The produced message is
+ * only attached once the worker completes, so consumers wait on `status` +
+ * `message`. Polling stops as soon as the generation settles.
+ */
+export function useGeneration(id: string | null) {
+  return useQuery({
+    queryKey: generationKeys.detail(id ?? ""),
+    queryFn: () => apiClient.get<GenerationDetail>(`/api/generations/${id}`),
+    enabled: Boolean(id),
+    refetchInterval: (query) => {
+      const status = query.state.data?.status;
+      return status === "pending" || status === "processing" ? 2000 : false;
+    },
+  });
+}
 
 /** The history list of generated messages for one prospect. */
 export function useMessages(prospectId: string) {

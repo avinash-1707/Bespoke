@@ -14,8 +14,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useOfferingOptions } from "@/lib/hooks/use-offerings";
-import { usePromptOptions } from "@/lib/hooks/use-prompts";
+import { useOfferingsInfinite } from "@/lib/hooks/use-offerings";
+import { usePromptsInfinite } from "@/lib/hooks/use-prompts";
 import {
   useCopyMessage,
   useCreateGeneration,
@@ -34,14 +34,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  EntityPicker,
+  type PickerOption,
+} from "@/components/shared/entity-picker";
 import { StatusBadge } from "@/components/shared/status-badge";
 
 /**
@@ -51,19 +48,22 @@ import { StatusBadge } from "@/components/shared/status-badge";
  * is in flight (see useMessages).
  */
 export function GenerationPanel({ prospectId }: { prospectId: string }) {
-  const offerings = useOfferingOptions();
-  const prompts = usePromptOptions();
   const messages = useMessages(prospectId);
   const createGeneration = useCreateGeneration(prospectId);
 
-  const [offeringId, setOfferingId] = useState("");
-  const [promptId, setPromptId] = useState("");
+  const [offering, setOffering] = useState<PickerOption | null>(null);
+  const [prompt, setPrompt] = useState<PickerOption | null>(null);
   const [tone, setTone] = useState("");
 
   function generate() {
-    if (!offeringId || !promptId) return;
+    if (!offering || !prompt) return;
     createGeneration.mutate(
-      { offeringId, promptId, prospectId, tone: tone || undefined },
+      {
+        offeringId: offering.id,
+        promptId: prompt.id,
+        prospectId,
+        tone: tone || undefined,
+      },
       {
         onSuccess: () => toast.success("Generating message…"),
         onError: (error) => toast.error(error.message),
@@ -84,38 +84,29 @@ export function GenerationPanel({ prospectId }: { prospectId: string }) {
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <Label>Offering</Label>
-            <Select
-              value={offeringId || undefined}
-              onValueChange={setOfferingId}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select an offering" />
-              </SelectTrigger>
-              <SelectContent>
-                {offerings.data?.map((o) => (
-                  <SelectItem key={o.id} value={o.id}>
-                    {o.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <EntityPicker
+              noun="offering"
+              placeholder="Select an offering"
+              selected={offering}
+              onSelect={setOffering}
+              useItems={useOfferingsInfinite}
+              toOption={(o) => ({ id: o.id, label: o.name })}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
             <Label>Prompt</Label>
-            <Select value={promptId || undefined} onValueChange={setPromptId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a prompt" />
-              </SelectTrigger>
-              <SelectContent>
-                {prompts.data?.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.name}
-                    {p.isDefault ? " (default)" : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <EntityPicker
+              noun="prompt"
+              placeholder="Select a prompt"
+              selected={prompt}
+              onSelect={setPrompt}
+              useItems={usePromptsInfinite}
+              toOption={(p) => ({
+                id: p.id,
+                label: p.isDefault ? `${p.name} (default)` : p.name,
+              })}
+            />
           </div>
         </div>
 
@@ -132,7 +123,7 @@ export function GenerationPanel({ prospectId }: { prospectId: string }) {
         <Button
           className="mt-4"
           onClick={generate}
-          disabled={createGeneration.isPending || !offeringId || !promptId}
+          disabled={createGeneration.isPending || !offering || !prompt}
         >
           {createGeneration.isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
