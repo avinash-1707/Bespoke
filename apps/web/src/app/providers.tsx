@@ -2,8 +2,14 @@
 
 import { useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "next-themes";
 
-/** App-wide client providers. TanStack Query drives all client data fetching. */
+/**
+ * App-wide client providers. TanStack Query drives all client data fetching;
+ * next-themes drives the product light/dark switch (class strategy, dark-first
+ * to match the brand). The landing + auth pages use their own fixed `--lp-*`
+ * palette and are unaffected by the theme class.
+ */
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
     () =>
@@ -15,6 +21,15 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }

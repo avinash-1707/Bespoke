@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { SettingsDialog } from "./settings-dialog";
+import { ThemeToggle } from "./theme-toggle";
 
 function initials(name: string | undefined, email: string | undefined): string {
   const source = name?.trim() || email || "?";
@@ -101,6 +102,8 @@ export function ProfileMenu() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <ThemeToggle />
 
         <button
           type="button"

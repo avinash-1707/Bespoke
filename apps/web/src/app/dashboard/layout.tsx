@@ -5,6 +5,7 @@ import { MotionConfig } from "motion/react";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarContent } from "@/components/shell/sidebar-content";
 import { MobileTopBar } from "@/components/shell/mobile-top-bar";
+import { SmoothScroll } from "@/components/shell/smooth-scroll";
 
 /**
  * Signed-in product shell: a fixed left rail on desktop (collapses to a sheet on
@@ -22,13 +23,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <MobileTopBar />
-          <main className="flex-1 overflow-y-auto">
+          <SmoothScroll className="flex-1">
             <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">{children}</div>
-          </main>
+          </SmoothScroll>
         </div>
       </div>
 
-      <Toaster theme="dark" position="bottom-right" richColors />
+      <Toaster position="bottom-right" richColors />
     </MotionConfig>
   );
 }

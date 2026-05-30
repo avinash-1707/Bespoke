@@ -8,7 +8,7 @@ export function Hero() {
     <section className="relative isolate overflow-hidden">
       {/* Constrained stage: globe + glow + copy all align to the same
           max-w-6xl column the rest of the page uses. */}
-      <div className="relative mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-36">
+      <div className="relative mx-auto max-w-6xl px-5 pb-24 pt-32 sm:px-8 lg:pb-36 lg:pt-44">
         {/* Rotating dot-globe, anchored to the column's right edge. */}
         <GlobeBackdrop />
         {/* Ambient glow warms the right side where the globe sits. */}

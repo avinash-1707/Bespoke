@@ -5,14 +5,14 @@ interface LandingLogoProps {
 }
 
 /**
- * Landing-page skin of the shared {@link BrandLogo}: navy mark on the warm
- * paper "ink" tile so the mark sits in the landing palette. The mark itself
+ * Landing-page skin of the shared {@link BrandLogo}: navy mark on a light paper
+ * tile so it sits cleanly on the warm nav/footer surfaces. The mark itself
  * lives in one place — see `components/brand-logo.tsx`.
  */
 export function LandingLogo({ className }: LandingLogoProps) {
   return (
     <BrandLogo
-      className={`bg-[var(--lp-text)] text-[var(--lp-accent)] ${className ?? ""}`}
+      className={`bg-[var(--lp-bg-raised)] text-[var(--lp-accent)] ${className ?? ""}`}
     />
   );
 }

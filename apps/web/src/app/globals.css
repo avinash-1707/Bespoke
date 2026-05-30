@@ -1,12 +1,45 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "lenis/dist/lenis.css";
 
 /*
  * Design tokens — single source of color truth (see context/ui-context.md).
- * Dark-only product. No hardcoded hex anywhere else; reference these vars
- * via Tailwind, e.g. bg-[var(--bg-surface)].
+ * The product supports light + dark via next-themes (class strategy):
+ * `:root` is the light palette, `.dark` overrides the surfaces/text/borders
+ * that change. Accent + state colors are shared across both. No hardcoded hex
+ * anywhere else; reference these vars, e.g. bg-[var(--bg-surface)].
  */
 :root {
+  color-scheme: light;
+
+  --bg-base: #fbfbfd;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f4f4f7;
+  --bg-surface-hover: #efeff3;
+
+  --text-primary: #1a1a24;
+  --text-secondary: #55556a;
+  --text-muted: #8e8ea4;
+
+  --accent-primary: #6366f1;
+  --accent-primary-hover: #4f52d9;
+  --accent-subtle: #6366f114;
+  --accent-text: #4f46e5;
+
+  --border-default: #e6e6ec;
+  --border-strong: #d4d4de;
+
+  --state-error: #ef4444;
+  --state-error-subtle: #ef444414;
+  --state-success: #22c55e;
+  --state-success-subtle: #22c55e14;
+  --state-warning: #f59e0b;
+  --state-warning-subtle: #f59e0b14;
+  --state-pending: #6366f1;
+  --state-favorite: #f59e0b;
+}
+
+.dark {
   color-scheme: dark;
 
   --bg-base: #09090e;
@@ -18,22 +51,10 @@
   --text-secondary: #a0a0b0;
   --text-muted: #5a5a70;
 
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f52d9;
-  --accent-subtle: #6366f114;
   --accent-text: #818cf8;
 
   --border-default: #1e1e2e;
   --border-strong: #2e2e42;
-
-  --state-error: #ef4444;
-  --state-error-subtle: #ef444414;
-  --state-success: #22c55e;
-  --state-success-subtle: #22c55e14;
-  --state-warning: #f59e0b;
-  --state-warning-subtle: #f59e0b14;
-  --state-pending: #6366f1;
-  --state-favorite: #f59e0b;
 }
 
 /*
@@ -144,6 +165,41 @@ body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Custom scrollbar — themed via tokens so it adapts to light/dark, applied to
+ * every scroll container on the platform. Track is transparent; the thumb is a
+ * pill that uses the inset trick (transparent border + padding-box clip) and
+ * darkens on hover. Firefox uses the standard `scrollbar-*` properties.
+ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /*

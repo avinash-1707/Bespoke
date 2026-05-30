@@ -11,6 +11,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { SidebarContent } from "./sidebar-content";
+import { ThemeToggle } from "./theme-toggle";
 
 /**
  * Mobile-only header: a menu button that opens the sidebar as a left sheet, and
@@ -39,11 +40,18 @@ export function MobileTopBar() {
       </Sheet>
 
       <Link href="/" className="flex items-center gap-2">
-        <BrandLogo size={24} />
+        <BrandLogo
+          size={24}
+          className="bg-transparent text-[var(--accent-text)]"
+        />
         <span className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
           Bespoke
         </span>
       </Link>
+
+      <div className="ml-auto">
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

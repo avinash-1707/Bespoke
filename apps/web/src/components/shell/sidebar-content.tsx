@@ -23,7 +23,10 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
         onClick={onNavigate}
         className="flex items-center gap-2.5 px-3 py-4"
       >
-        <BrandLogo size={28} />
+        <BrandLogo
+          size={28}
+          className="bg-transparent text-[var(--accent-text)]"
+        />
         <span className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
           Bespoke
         </span>
