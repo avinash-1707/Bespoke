@@ -31,7 +31,7 @@ interface InfiniteList<T> {
 }
 
 interface EntityPickerProps<T> {
-  /** Singular noun for the entity, e.g. "prospect" — drives the dialog title. */
+  /** Singular noun for the entity, e.g. "prospect"; drives the dialog title. */
   noun: string;
   placeholder: string;
   selected: PickerOption | null;
@@ -41,6 +41,15 @@ interface EntityPickerProps<T> {
   toOption: (item: T) => PickerOption;
   /** Optional cursor-following hover preview per row (e.g. an offering summary). */
   toPreview?: (item: T) => ReactNode;
+  /**
+   * Optional custom trigger. When provided, replaces the default dropdown-style
+   * button. The picker only owns the modal + search; the caller owns the
+   * affordance. `open()` launches the modal; `selected` reflects the choice.
+   */
+  renderTrigger?: (args: {
+    open: () => void;
+    selected: PickerOption | null;
+  }) => ReactNode;
 }
 
 /** One selectable row, with an optional cursor-following hover preview. */
@@ -92,6 +101,7 @@ export function EntityPicker<T>({
   useItems,
   toOption,
   toPreview,
+  renderTrigger,
 }: EntityPickerProps<T>) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -113,22 +123,28 @@ export function EntityPicker<T>({
 
   return (
     <>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => setOpen(true)}
-        className="w-full justify-between font-normal"
-      >
-        <span
-          className={cn(
-            "truncate",
-            selected ? "text-[var(--text-primary)]" : "text-[var(--text-muted)]",
-          )}
+      {renderTrigger ? (
+        renderTrigger({ open: () => setOpen(true), selected })
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setOpen(true)}
+          className="w-full justify-between font-normal"
         >
-          {selected?.label ?? placeholder}
-        </span>
-        <ChevronDown className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
-      </Button>
+          <span
+            className={cn(
+              "truncate",
+              selected
+                ? "text-[var(--text-primary)]"
+                : "text-[var(--text-muted)]",
+            )}
+          >
+            {selected?.label ?? placeholder}
+          </span>
+          <ChevronDown className="h-4 w-4 shrink-0 text-[var(--text-muted)]" />
+        </Button>
+      )}
 
       <Dialog
         open={open}
