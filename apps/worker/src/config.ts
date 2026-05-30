@@ -12,7 +12,7 @@ const schema = z.object({
   DATABASE_URL: z.string().url(),
   REDIS_URL: z.string().url(),
   OPENROUTER_API_KEY: z.string().min(1),
-  OPENROUTER_MODEL: z.string().default("anthropic/claude-3.5-sonnet"),
+  OPENROUTER_MODEL: z.string().default("anthropic/claude-sonnet-latest"),
   FIRECRAWL_API_KEY: z.string().min(1),
   CLOUDINARY_CLOUD_NAME: z.string().min(1),
   CLOUDINARY_API_KEY: z.string().min(1),

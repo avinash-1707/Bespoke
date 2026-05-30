@@ -13,6 +13,7 @@ import {
   uploadToCloudinary,
   useCloudinarySignature,
 } from "@/lib/hooks/use-uploads";
+import { GenerationPanel } from "@/components/generation-panel";
 
 const URL_ASSET_TYPES: ProspectAssetType[] = [
   "github",
@@ -192,6 +193,8 @@ export default function ProspectDetailPage() {
         <h2>Consolidated context</h2>
         <pre>{prospect.data.context?.mergedContext ?? "Not built yet."}</pre>
       </section>
+
+      <GenerationPanel prospectId={id} />
     </main>
   );
 }

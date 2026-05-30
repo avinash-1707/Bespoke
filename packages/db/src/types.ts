@@ -19,6 +19,7 @@ import type {
   scrapeJobs,
   generationJobs,
   analyticsEvents,
+  userSettings,
 } from "./schema/index";
 
 export type Offering = typeof offerings.$inferSelect;
@@ -65,3 +66,6 @@ export type NewGenerationJob = typeof generationJobs.$inferInsert;
 
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type NewAnalyticsEvent = typeof analyticsEvents.$inferInsert;
+
+export type UserSettings = typeof userSettings.$inferSelect;
+export type NewUserSettings = typeof userSettings.$inferInsert;
