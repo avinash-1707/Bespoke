@@ -5,19 +5,21 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-full border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3",
+  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded border border-transparent px-2 py-0.5 text-xs font-medium tracking-wide whitespace-nowrap transition-[color,box-shadow] focus-visible:border-ring [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        default:
+          "bg-[var(--accent-subtle)] text-[var(--accent-text)] [a&]:hover:bg-[var(--bg-surface-hover)]",
         secondary:
-          "bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+          "bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] [a&]:hover:bg-[var(--bg-surface-hover)]",
         destructive:
-          "bg-destructive text-white dark:bg-destructive/60 [a&]:hover:bg-destructive/90",
+          "bg-[var(--state-error-subtle)] text-[var(--state-error)] [a&]:hover:bg-[var(--bg-surface-hover)]",
         outline:
-          "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 [a&]:hover:underline",
+          "border-[var(--border-strong)] text-[var(--text-secondary)] [a&]:hover:bg-[var(--bg-surface-hover)] [a&]:hover:text-[var(--text-primary)]",
+        ghost:
+          "[a&]:hover:bg-[var(--bg-surface-hover)] [a&]:hover:text-[var(--text-primary)]",
+        link: "text-[var(--accent-text)] underline-offset-4 [a&]:hover:underline",
       },
     },
     defaultVariants: {

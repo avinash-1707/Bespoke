@@ -37,6 +37,17 @@
   --state-warning-subtle: #f59e0b14;
   --state-pending: #6366f1;
   --state-favorite: #f59e0b;
+
+  /*
+   * Elevation tokens — the whole box-shadow value lives here (single source,
+   * no shadow colors hardcoded in components). `raise` carries a top inset
+   * highlight so raised controls read as lit from above (the crafted, tactile
+   * feel that separates the product from default shadcn flatness).
+   */
+  --shadow-card: 0 1px 2px 0 rgba(26, 26, 36, 0.05), 0 4px 14px -6px rgba(26, 26, 36, 0.08);
+  --shadow-pop: 0 10px 34px -8px rgba(26, 26, 36, 0.16), 0 2px 6px -2px rgba(26, 26, 36, 0.08);
+  --shadow-raise: inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 1px 2px 0 rgba(26, 26, 36, 0.16);
+  --shadow-accent: 0 6px 18px -6px rgba(99, 102, 241, 0.45);
 }
 
 .dark {
@@ -55,6 +66,11 @@
 
   --border-default: #1e1e2e;
   --border-strong: #2e2e42;
+
+  --shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.5), 0 8px 22px -8px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 14px 44px -10px rgba(0, 0, 0, 0.72), 0 4px 12px -4px rgba(0, 0, 0, 0.55);
+  --shadow-raise: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --shadow-accent: 0 6px 20px -6px rgba(99, 102, 241, 0.55);
 }
 
 /*
@@ -168,6 +184,18 @@ body {
 }
 
 /*
+ * Default border color. Tailwind v4 leaves bare `border`/`border-l` utilities
+ * at `currentColor`; without this, shadcn primitives that use unqualified
+ * border classes (Sheet edges, etc.) would draw text-colored lines. Pin them
+ * to the hairline token so every border is a subtle hairline by default.
+ */
+@layer base {
+  * {
+    border-color: var(--border-default);
+  }
+}
+
+/*
  * Custom scrollbar — themed via tokens so it adapts to light/dark, applied to
  * every scroll container on the platform. Track is transparent; the thumb is a
  * pill that uses the inset trick (transparent border + padding-box clip) and
@@ -200,6 +228,40 @@ body {
 
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/*
+ * Skeleton shimmer — a single light band sweeps across the placeholder instead
+ * of the default whole-block pulse, which reads as more deliberate/premium. The
+ * base fill is set on the element; this overlays the moving highlight. Honors
+ * reduced-motion by holding still.
+ */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--bg-surface-hover),
+    transparent
+  );
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after {
+    animation: none;
+  }
 }
 
 /*
