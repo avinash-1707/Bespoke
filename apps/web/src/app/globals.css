@@ -35,10 +35,40 @@
   --state-favorite: #f59e0b;
 }
 
+/*
+ * Landing page tokens — warm editorial "atelier" palette, fully isolated
+ * from the dark product theme above. Change the look of the entire landing
+ * page by editing only these `--lp-*` variables.
+ */
+:root {
+  --lp-bg: #f4f0e7;
+  --lp-bg-raised: #faf7f0;
+  --lp-bg-sunk: #ece6d8;
+  --lp-ink-panel: #17130f;
+  --lp-ink-panel-raised: #221c16;
+
+  --lp-text: #211c17;
+  --lp-text-soft: #6b6051;
+  --lp-text-faint: #9b9081;
+  --lp-text-invert: #f4efe4;
+  --lp-text-invert-soft: #b9ad99;
+
+  --lp-line: #ddd4c4;
+  --lp-line-strong: #c7bca8;
+  --lp-line-invert: #3a322a;
+
+  --lp-accent: #1e3a8a;
+  --lp-accent-deep: #172554;
+  --lp-accent-tint: #1e3a8a1a;
+  --lp-gold: #b08a4f;
+}
+
 /* Expose tokens + next/font faces to Tailwind's utility generator. */
 @theme inline {
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
+  --font-display: var(--font-bricolage);
+  --font-body: var(--font-hanken);
 
   --color-bg-base: var(--bg-base);
   --color-bg-surface: var(--bg-surface);
@@ -55,4 +85,44 @@ body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Landing ambient loops. Scroll/enter and message-composition motion is
+ * handled by motion/react in the components; these are the slow, decorative
+ * background loops that do not warrant a JS animation runtime.
+ */
+
+/* Soft drifting glow behind the hero: slow, ambient, never distracting. */
+@keyframes lp-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+  }
+}
+.lp-drift {
+  animation: lp-drift 14s ease-in-out infinite;
+}
+
+/* Marquee for the trust strip: pure transform, GPU friendly. */
+@keyframes lp-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.lp-marquee {
+  animation: lp-marquee 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-drift,
+  .lp-marquee {
+    animation: none;
+  }
 }
