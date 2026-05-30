@@ -5,6 +5,7 @@ import { schema } from "@bespoke/db";
 import type { GenerateMessagePayload } from "@bespoke/queue";
 import { db } from "../lib/db";
 import { modelFor } from "../lib/ai";
+import { logger } from "../lib/logger";
 import { config } from "../config";
 
 /** Compose the user-message context block from offering + prospect + knobs. */
@@ -46,6 +47,7 @@ export async function generateMessage(
 ): Promise<void> {
   const { generationId, userId } = job.data;
   const jobFilter = eq(schema.generationJobs.bullmqJobId, job.id ?? "");
+  const log = logger.child({ job: job.name, jobId: job.id, generationId });
 
   await db
     .update(schema.generationJobs)
@@ -93,13 +95,20 @@ export async function generateMessage(
       job.data.angle,
     );
 
+    const modelSlug = generation.model || config.OPENROUTER_MODEL;
+    log.info("generating message", { model: modelSlug });
     const startedAt = Date.now();
     const { text, usage } = await generateText({
-      model: modelFor(generation.model || config.OPENROUTER_MODEL),
+      model: modelFor(modelSlug),
       system: prompt.systemPrompt,
       prompt: userPrompt,
     });
     const latencyMs = Date.now() - startedAt;
+    log.info("message generated", {
+      latencyMs,
+      tokensInput: usage?.inputTokens ?? null,
+      tokensOutput: usage?.outputTokens ?? null,
+    });
 
     await db.insert(schema.generatedMessages).values({
       generationId,
@@ -131,6 +140,7 @@ export async function generateMessage(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    log.error("generate-message failed", { error: message });
     await db
       .update(schema.aiGenerations)
       .set({ status: "failed" })

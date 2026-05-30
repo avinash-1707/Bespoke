@@ -5,6 +5,7 @@ import { schema } from "@bespoke/db";
 import type { GenerateReplyPayload } from "@bespoke/queue";
 import { db } from "../lib/db";
 import { modelFor } from "../lib/ai";
+import { logger } from "../lib/logger";
 import { config } from "../config";
 
 /** Render the thread as a labelled transcript for the model. */
@@ -32,6 +33,12 @@ export async function generateReply(
 ): Promise<void> {
   const { generationId, conversationId, userId } = job.data;
   const jobFilter = eq(schema.generationJobs.bullmqJobId, job.id ?? "");
+  const log = logger.child({
+    job: job.name,
+    jobId: job.id,
+    generationId,
+    conversationId,
+  });
 
   await db
     .update(schema.generationJobs)
@@ -86,13 +93,20 @@ export async function generateReply(
       .filter(Boolean)
       .join("\n");
 
+    const modelSlug = generation.model || config.OPENROUTER_MODEL;
+    log.info("generating reply", { model: modelSlug, threadLen: thread.length });
     const startedAt = Date.now();
     const { text, usage } = await generateText({
-      model: modelFor(generation.model || config.OPENROUTER_MODEL),
+      model: modelFor(modelSlug),
       system: prompt?.systemPrompt ?? "You are a helpful sales assistant.",
       prompt: userPrompt,
     });
     const latencyMs = Date.now() - startedAt;
+    log.info("reply generated", {
+      latencyMs,
+      tokensInput: usage?.inputTokens ?? null,
+      tokensOutput: usage?.outputTokens ?? null,
+    });
 
     await db.insert(schema.conversationMessages).values({
       conversationId,
@@ -124,6 +138,7 @@ export async function generateReply(
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    log.error("generate-reply failed", { error: message });
     await db
       .update(schema.aiGenerations)
       .set({ status: "failed" })

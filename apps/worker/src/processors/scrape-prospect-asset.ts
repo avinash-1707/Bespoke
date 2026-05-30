@@ -13,6 +13,7 @@ import { scrapeMarkdown } from "../lib/firecrawl";
 import { deliveryUrl } from "../lib/cloudinary";
 import { model } from "../lib/ai";
 import { queues } from "../lib/queue";
+import { logger } from "../lib/logger";
 
 /** Fields the LLM extracts from one prospect asset. */
 const insightSchema = z.object({
@@ -111,6 +112,12 @@ export async function scrapeProspectAsset(
 ): Promise<void> {
   const { assetId, prospectId, userId } = job.data;
   const jobFilter = eq(schema.scrapeJobs.bullmqJobId, job.id ?? "");
+  const log = logger.child({
+    job: job.name,
+    jobId: job.id,
+    assetId,
+    prospectId,
+  });
 
   await db
     .update(schema.scrapeJobs)
@@ -130,7 +137,9 @@ export async function scrapeProspectAsset(
       throw new Error(`Prospect asset ${assetId} not found`);
     }
 
+    log.info("extracting asset", { assetType: asset.assetType });
     const insight = await extractAsset(asset);
+    log.info("asset extracted", { hasInsight: insight !== null });
 
     // `notes` assets contribute no insight (free text lives on prospect.notes).
     if (insight) {
@@ -154,6 +163,7 @@ export async function scrapeProspectAsset(
     await maybeConsolidate(prospectId, userId);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
+    log.error("scrape-prospect-asset failed", { error: message });
     await db
       .update(schema.prospectAssets)
       .set({ status: "failed" })

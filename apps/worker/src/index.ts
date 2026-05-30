@@ -10,6 +10,7 @@ import {
   type ScrapeProspectAssetPayload,
 } from "@bespoke/queue";
 import { config } from "./config";
+import { logger } from "./lib/logger";
 import { scrapeOfferingSource } from "./processors/scrape-offering-source";
 import { scrapeProspectAsset } from "./processors/scrape-prospect-asset";
 import { consolidateInsights } from "./processors/consolidate-insights";
@@ -66,15 +67,39 @@ const workers: Worker[] = [
 ];
 
 for (const worker of workers) {
+  worker.on("active", (job) => {
+    logger.info("job started", { jobId: job.id, job: job.name, queue: job.queueName });
+  });
+  worker.on("completed", (job) => {
+    const durationMs =
+      job.finishedOn && job.processedOn ? job.finishedOn - job.processedOn : null;
+    logger.info("job completed", {
+      jobId: job.id,
+      job: job.name,
+      queue: job.queueName,
+      durationMs,
+    });
+  });
   worker.on("failed", (job, err) => {
-    console.error(`Job ${job?.id ?? "?"} (${job?.name}) failed:`, err.message);
+    logger.error("job failed", {
+      jobId: job?.id ?? null,
+      job: job?.name ?? null,
+      queue: job?.queueName ?? null,
+      attemptsMade: job?.attemptsMade ?? null,
+      error: err.message,
+    });
+  });
+  worker.on("error", (err) => {
+    logger.error("worker error", { error: err.message });
   });
 }
 
-console.log("Worker ready — listening on scrape-queue and generate-queue");
+logger.info("worker ready", {
+  queues: [QUEUE_NAME.scrape, QUEUE_NAME.generate],
+});
 
 async function shutdown(): Promise<void> {
-  console.log("Shutting down worker…");
+  logger.info("worker shutting down");
   await Promise.all(workers.map((w) => w.close()));
   await connection.quit();
   process.exit(0);
