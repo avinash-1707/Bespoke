@@ -1,12 +1,15 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 import { schema, type Offering, type OfferingSource } from "@bespoke/db";
 import { JOB_NAME, QUEUE_NAME, enqueueJob } from "@bespoke/queue";
 import {
   compileOfferingContext,
+  type CursorPage,
+  type ListQuery,
   type OfferingContextFields,
 } from "@bespoke/shared";
 import { db } from "../context";
 import { queues } from "../queue";
+import { clampLimit, decodeCursor, keysetBefore, toPage } from "./_cursor";
 
 export interface CreateOfferingInput extends OfferingContextFields {
   /** Optional URL to scrape and merge into the offering in the background. */
@@ -69,12 +72,36 @@ async function enqueueOfferingScrape(
     .where(eq(schema.scrapeJobs.id, job!.id));
 }
 
-export async function listOfferings(userId: string): Promise<Offering[]> {
-  return db
+/**
+ * Cursor-paginated, name-searchable offering list scoped to the user. Orders by
+ * `createdAt DESC, id DESC` so the keyset cursor is stable across pages.
+ */
+export async function listOfferings(
+  userId: string,
+  query: ListQuery = {},
+): Promise<CursorPage<Offering>> {
+  const limit = clampLimit(query.limit);
+  const search = query.q?.trim();
+  const keyset = keysetBefore(
+    schema.offerings.createdAt,
+    schema.offerings.id,
+    decodeCursor(query.cursor),
+  );
+
+  const rows = await db
     .select()
     .from(schema.offerings)
-    .where(eq(schema.offerings.userId, userId))
-    .orderBy(desc(schema.offerings.createdAt));
+    .where(
+      and(
+        eq(schema.offerings.userId, userId),
+        search ? ilike(schema.offerings.name, `%${search}%`) : undefined,
+        keyset,
+      ),
+    )
+    .orderBy(desc(schema.offerings.createdAt), desc(schema.offerings.id))
+    .limit(limit + 1);
+
+  return toPage(rows, limit);
 }
 
 export async function getOffering(
@@ -175,6 +202,27 @@ export async function deleteOffering(
     .returning({ id: schema.offerings.id });
 
   return deleted.length > 0;
+}
+
+/**
+ * Batch-delete offerings the user owns. Foreign ids are silently ignored by the
+ * `user_id` filter; returns the count of rows actually removed.
+ */
+export async function deleteManyOfferings(
+  userId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const deleted = await db
+    .delete(schema.offerings)
+    .where(
+      and(
+        eq(schema.offerings.userId, userId),
+        inArray(schema.offerings.id, ids),
+      ),
+    )
+    .returning({ id: schema.offerings.id });
+  return deleted.length;
 }
 
 /**

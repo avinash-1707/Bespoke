@@ -29,3 +29,19 @@ export interface Paginated<T> {
   items: T[];
   total: number;
 }
+
+/**
+ * Keyset (cursor) pagination payload. `nextCursor` is an opaque token the
+ * client passes back to fetch the following page; null means the last page.
+ */
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor: string | null;
+}
+
+/** Query params accepted by cursor-paginated, searchable list endpoints. */
+export interface ListQuery {
+  cursor?: string;
+  limit?: number;
+  q?: string;
+}

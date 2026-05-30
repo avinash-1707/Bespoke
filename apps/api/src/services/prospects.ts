@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import {
   schema,
   type Prospect,
@@ -6,9 +6,14 @@ import {
   type ProspectContext,
 } from "@bespoke/db";
 import { JOB_NAME, QUEUE_NAME, enqueueJob } from "@bespoke/queue";
-import type { ProspectAssetType } from "@bespoke/shared";
+import type {
+  CursorPage,
+  ListQuery,
+  ProspectAssetType,
+} from "@bespoke/shared";
 import { db } from "../context";
 import { queues } from "../queue";
+import { clampLimit, decodeCursor, keysetBefore, toPage } from "./_cursor";
 
 export interface ProspectAssetInput {
   assetType: ProspectAssetType;
@@ -91,12 +96,42 @@ async function enqueueProspectAssetScrape(
   return created!;
 }
 
-export async function listProspects(userId: string): Promise<Prospect[]> {
-  return db
+/**
+ * Cursor-paginated prospect list scoped to the user. Search matches name,
+ * company, or email. Ordered by `createdAt DESC, id DESC` for a stable keyset.
+ */
+export async function listProspects(
+  userId: string,
+  query: ListQuery = {},
+): Promise<CursorPage<Prospect>> {
+  const limit = clampLimit(query.limit);
+  const search = query.q?.trim();
+  const keyset = keysetBefore(
+    schema.prospects.createdAt,
+    schema.prospects.id,
+    decodeCursor(query.cursor),
+  );
+
+  const rows = await db
     .select()
     .from(schema.prospects)
-    .where(eq(schema.prospects.userId, userId))
-    .orderBy(desc(schema.prospects.createdAt));
+    .where(
+      and(
+        eq(schema.prospects.userId, userId),
+        search
+          ? or(
+              ilike(schema.prospects.name, `%${search}%`),
+              ilike(schema.prospects.companyName, `%${search}%`),
+              ilike(schema.prospects.email, `%${search}%`),
+            )
+          : undefined,
+        keyset,
+      ),
+    )
+    .orderBy(desc(schema.prospects.createdAt), desc(schema.prospects.id))
+    .limit(limit + 1);
+
+  return toPage(rows, limit);
 }
 
 export async function getProspect(
@@ -186,6 +221,27 @@ export async function deleteProspect(
     )
     .returning({ id: schema.prospects.id });
   return deleted.length > 0;
+}
+
+/**
+ * Batch-delete prospects the user owns. Foreign ids are ignored by the
+ * `user_id` filter; returns the count of rows actually removed.
+ */
+export async function deleteManyProspects(
+  userId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const deleted = await db
+    .delete(schema.prospects)
+    .where(
+      and(
+        eq(schema.prospects.userId, userId),
+        inArray(schema.prospects.id, ids),
+      ),
+    )
+    .returning({ id: schema.prospects.id });
+  return deleted.length;
 }
 
 /**

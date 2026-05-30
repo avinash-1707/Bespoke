@@ -4,7 +4,9 @@ import { requireAuth } from "../../plugins/auth";
 import * as prospectsService from "../../services/prospects";
 import {
   addAssetBody,
+  batchDeleteBody,
   createProspectBody,
+  listQuery,
   prospectIdParams,
   updateProspectBody,
 } from "./schema";
@@ -16,9 +18,22 @@ export async function prospectRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>();
   app.addHook("preHandler", requireAuth);
 
-  app.get("/", async (request) => ({
-    data: await prospectsService.listProspects(request.userId),
+  app.get("/", { schema: { querystring: listQuery } }, async (request) => ({
+    data: await prospectsService.listProspects(request.userId, request.query),
   }));
+
+  app.post(
+    "/batch-delete",
+    { schema: { body: batchDeleteBody } },
+    async (request) => ({
+      data: {
+        deleted: await prospectsService.deleteManyProspects(
+          request.userId,
+          request.body.ids,
+        ),
+      },
+    }),
+  );
 
   app.get(
     "/:id",

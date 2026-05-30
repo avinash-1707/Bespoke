@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
 /*
  * Design tokens — single source of color truth (see context/ui-context.md).
@@ -33,6 +34,37 @@
   --state-warning-subtle: #f59e0b14;
   --state-pending: #6366f1;
   --state-favorite: #f59e0b;
+}
+
+/*
+ * shadcn/ui semantic tokens, mapped onto the dark product palette above so the
+ * generated primitives (Button, Dialog, DropdownMenu, etc.) inherit our theme
+ * with zero per-component overrides. No new colors: every value points at an
+ * existing --bg-* / --text-* / --accent-* / --state-* token. Edit the palette
+ * above to restyle both the bespoke components and the shadcn primitives.
+ */
+:root {
+  --radius: 0.5rem;
+
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-surface-elevated);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent-primary);
+  --primary-foreground: var(--text-primary);
+  --secondary: var(--bg-surface-elevated);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-surface-elevated);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--bg-surface-hover);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--state-error);
+  --destructive-foreground: var(--text-primary);
+  --border: var(--border-default);
+  --input: var(--border-strong);
+  --ring: var(--accent-primary);
 }
 
 /*
@@ -79,8 +111,33 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
-  --color-accent: var(--accent-primary);
   --color-border-default: var(--border-default);
+
+  /* shadcn/ui semantic color + radius scale (see :root mapping above). */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 body {

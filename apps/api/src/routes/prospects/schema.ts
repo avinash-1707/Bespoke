@@ -41,3 +41,13 @@ export const addAssetBody = assetInput;
 export const prospectIdParams = z.object({
   id: z.string().uuid(),
 });
+
+export const listQuery = z.object({
+  cursor: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  q: z.string().max(200).optional(),
+});
+
+export const batchDeleteBody = z.object({
+  ids: z.array(z.string().uuid()).min(1).max(100),
+});

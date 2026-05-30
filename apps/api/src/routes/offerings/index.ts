@@ -4,7 +4,9 @@ import { requireAuth } from "../../plugins/auth";
 import * as offeringsService from "../../services/offerings";
 import {
   addSourceBody,
+  batchDeleteBody,
   createOfferingBody,
+  listQuery,
   offeringIdParams,
   updateOfferingBody,
 } from "./schema";
@@ -20,9 +22,22 @@ export async function offeringRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>();
   app.addHook("preHandler", requireAuth);
 
-  app.get("/", async (request) => ({
-    data: await offeringsService.listOfferings(request.userId),
+  app.get("/", { schema: { querystring: listQuery } }, async (request) => ({
+    data: await offeringsService.listOfferings(request.userId, request.query),
   }));
+
+  app.post(
+    "/batch-delete",
+    { schema: { body: batchDeleteBody } },
+    async (request) => ({
+      data: {
+        deleted: await offeringsService.deleteManyOfferings(
+          request.userId,
+          request.body.ids,
+        ),
+      },
+    }),
+  );
 
   app.get(
     "/:id",

@@ -1,6 +1,8 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray } from "drizzle-orm";
 import { schema, type Prompt } from "@bespoke/db";
+import type { CursorPage, ListQuery } from "@bespoke/shared";
 import { db } from "../context";
+import { clampLimit, decodeCursor, keysetBefore, toPage } from "./_cursor";
 
 export interface CreatePromptInput {
   name: string;
@@ -22,12 +24,37 @@ async function recordAnalytics(
   });
 }
 
-export async function listPrompts(userId: string): Promise<Prompt[]> {
-  return db
+/**
+ * Cursor-paginated, name-searchable prompt list scoped to the user. Paginates
+ * by `createdAt DESC, id DESC` for a clean keyset; the default prompt is still
+ * returned and surfaced via the `isDefault` flag (shown as a badge in the UI).
+ */
+export async function listPrompts(
+  userId: string,
+  query: ListQuery = {},
+): Promise<CursorPage<Prompt>> {
+  const limit = clampLimit(query.limit);
+  const search = query.q?.trim();
+  const keyset = keysetBefore(
+    schema.prompts.createdAt,
+    schema.prompts.id,
+    decodeCursor(query.cursor),
+  );
+
+  const rows = await db
     .select()
     .from(schema.prompts)
-    .where(eq(schema.prompts.userId, userId))
-    .orderBy(desc(schema.prompts.isDefault), desc(schema.prompts.createdAt));
+    .where(
+      and(
+        eq(schema.prompts.userId, userId),
+        search ? ilike(schema.prompts.name, `%${search}%`) : undefined,
+        keyset,
+      ),
+    )
+    .orderBy(desc(schema.prompts.createdAt), desc(schema.prompts.id))
+    .limit(limit + 1);
+
+  return toPage(rows, limit);
 }
 
 export async function getPrompt(
@@ -115,4 +142,22 @@ export async function deletePrompt(
     .where(and(eq(schema.prompts.id, id), eq(schema.prompts.userId, userId)))
     .returning({ id: schema.prompts.id });
   return deleted.length > 0;
+}
+
+/**
+ * Batch-delete prompts the user owns. Foreign ids are ignored by the `user_id`
+ * filter; returns the count of rows actually removed.
+ */
+export async function deleteManyPrompts(
+  userId: string,
+  ids: string[],
+): Promise<number> {
+  if (ids.length === 0) return 0;
+  const deleted = await db
+    .delete(schema.prompts)
+    .where(
+      and(eq(schema.prompts.userId, userId), inArray(schema.prompts.id, ids)),
+    )
+    .returning({ id: schema.prompts.id });
+  return deleted.length;
 }

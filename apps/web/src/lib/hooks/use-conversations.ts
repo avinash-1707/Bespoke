@@ -13,6 +13,7 @@ export interface ConversationWithMessages extends Conversation {
 }
 
 const conversationKeys = {
+  all: ["conversations", "all"] as const,
   list: (prospectId: string) => ["conversations", "prospect", prospectId] as const,
   detail: (id: string) => ["conversations", id] as const,
 };
@@ -26,6 +27,14 @@ export function useConversations(prospectId: string) {
         `/api/conversations?prospectId=${prospectId}`,
       ),
     enabled: Boolean(prospectId),
+  });
+}
+
+/** Every conversation for the signed-in user (Conversations tab). */
+export function useAllConversations() {
+  return useQuery({
+    queryKey: conversationKeys.all,
+    queryFn: () => apiClient.get<Conversation[]>("/api/conversations"),
   });
 }
 

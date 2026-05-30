@@ -19,7 +19,7 @@ export default function SignUpPage() {
     event.preventDefault();
     signUp.mutate(
       { name, email, password },
-      { onSuccess: () => router.push("/") },
+      { onSuccess: () => router.push("/dashboard") },
     );
   }
 

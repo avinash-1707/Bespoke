@@ -16,7 +16,10 @@ export default function SignInPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    signIn.mutate({ email, password }, { onSuccess: () => router.push("/") });
+    signIn.mutate(
+      { email, password },
+      { onSuccess: () => router.push("/dashboard") },
+    );
   }
 
   return (

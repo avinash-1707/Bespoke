@@ -3,7 +3,9 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { requireAuth } from "../../plugins/auth";
 import * as promptsService from "../../services/prompts";
 import {
+  batchDeleteBody,
   createPromptBody,
+  listQuery,
   promptIdParams,
   updatePromptBody,
 } from "./schema";
@@ -15,9 +17,22 @@ export async function promptRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>();
   app.addHook("preHandler", requireAuth);
 
-  app.get("/", async (request) => ({
-    data: await promptsService.listPrompts(request.userId),
+  app.get("/", { schema: { querystring: listQuery } }, async (request) => ({
+    data: await promptsService.listPrompts(request.userId, request.query),
   }));
+
+  app.post(
+    "/batch-delete",
+    { schema: { body: batchDeleteBody } },
+    async (request) => ({
+      data: {
+        deleted: await promptsService.deleteManyPrompts(
+          request.userId,
+          request.body.ids,
+        ),
+      },
+    }),
+  );
 
   app.get(
     "/:id",
