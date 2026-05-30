@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import {
   useInfiniteQuery,
   useMutation,
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import type { Prospect, ProspectAsset, ProspectContext } from "@bespoke/db";
 import type { CursorPage, ProspectAssetType } from "@bespoke/shared";
 import { apiClient } from "../api-client";
+import { isOptimisticId } from "../format";
 import {
   flattenPages,
   listSearchParams,
@@ -23,7 +25,12 @@ import {
 export type ProspectWithDetails = Prospect & {
   assets: ProspectAsset[];
   context: ProspectContext | null;
+  /** True while any asset is still scraping or before context is built. */
+  scraping: boolean;
 };
+
+/** List row with the derived enrichment state that drives the pulsing card. */
+export type ProspectListItem = Prospect & { scraping: boolean };
 
 export interface ProspectAssetInput {
   assetType: ProspectAssetType;
@@ -50,7 +57,7 @@ const prospectKeys = {
   detail: (id: string) => ["prospects", id] as const,
 };
 
-function optimisticProspect(input: CreateProspectInput): Prospect {
+function optimisticProspect(input: CreateProspectInput): ProspectListItem {
   const now = new Date();
   return {
     id: `optimistic-${crypto.randomUUID()}`,
@@ -62,7 +69,9 @@ function optimisticProspect(input: CreateProspectInput): Prospect {
     notes: input.notes ?? null,
     createdAt: now,
     updatedAt: now,
-  } as Prospect;
+    // Any attached asset means enrichment starts now — pulse immediately.
+    scraping: (input.assets?.length ?? 0) > 0,
+  } as ProspectListItem;
 }
 
 /** Cursor-paginated prospect list (search matches name/company/email). */
@@ -70,7 +79,7 @@ export function useProspectsInfinite(q: string, enabled = true) {
   const query = useInfiniteQuery({
     queryKey: prospectKeys.list(q),
     queryFn: ({ pageParam }) =>
-      apiClient.get<CursorPage<Prospect>>(
+      apiClient.get<CursorPage<ProspectListItem>>(
         `/api/prospects${listSearchParams({ cursor: pageParam, q, limit: PAGE_SIZE })}`,
       ),
     initialPageParam: undefined as string | undefined,
@@ -85,7 +94,37 @@ export function useProspect(id: string) {
     queryKey: prospectKeys.detail(id),
     queryFn: () => apiClient.get<ProspectWithDetails>(`/api/prospects/${id}`),
     enabled: Boolean(id),
+    // Live-update per-asset status + context while enrichment is in flight.
+    refetchInterval: (query) => (query.state.data?.scraping ? 2000 : false),
   });
+}
+
+/**
+ * While a prospect is enriching (real row only), poll its detail until the
+ * worker finishes scraping every asset and builds the context. On that
+ * transition, toast the user and refresh the lists so the card stops pulsing.
+ */
+export function useWatchProspectScrape(prospect: ProspectListItem) {
+  const queryClient = useQueryClient();
+  const watching = prospect.scraping && !isOptimisticId(prospect.id);
+  const wasScraping = useRef(prospect.scraping);
+
+  const { data } = useQuery({
+    queryKey: prospectKeys.detail(prospect.id),
+    queryFn: () =>
+      apiClient.get<ProspectWithDetails>(`/api/prospects/${prospect.id}`),
+    enabled: watching,
+    refetchInterval: (query) => (query.state.data?.scraping ? 2500 : false),
+  });
+
+  useEffect(() => {
+    if (!data) return;
+    if (wasScraping.current && !data.scraping) {
+      toast.success(`“${data.name}” is ready`);
+      void queryClient.invalidateQueries({ queryKey: prospectKeys.lists });
+    }
+    wasScraping.current = data.scraping;
+  }, [data, queryClient]);
 }
 
 export function useCreateProspect() {
@@ -172,6 +211,8 @@ export function useAddProspectAsset(id: string) {
     onSuccess: () => {
       toast.success("Asset added, processing in the background");
       void queryClient.invalidateQueries({ queryKey: prospectKeys.detail(id) });
+      // Surface the renewed scraping state on the list card too.
+      void queryClient.invalidateQueries({ queryKey: prospectKeys.lists });
     },
     onError: (error) => toast.error(error.message),
   });

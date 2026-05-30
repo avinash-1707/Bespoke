@@ -35,6 +35,64 @@ export type UpdateProspectInput = Partial<Omit<CreateProspectInput, "assets">>;
 export interface ProspectWithDetails extends Prospect {
   assets: ProspectAsset[];
   context: ProspectContext | null;
+  /** True while any asset is still being scraped or before context is built. */
+  scraping: boolean;
+}
+
+/** List row carrying the derived enrichment state for the pulsing card. */
+export interface ProspectListItem extends Prospect {
+  scraping: boolean;
+}
+
+/**
+ * A prospect is "scraping" while it has assets and either one is still
+ * pending/processing or its consolidated context has not been built yet. A
+ * prospect with no assets is never scraping. Mirrors the offering's `scraping`
+ * status, but derived (prospects have no status column).
+ */
+function deriveScraping(
+  statuses: ProspectAsset["status"][],
+  hasContext: boolean,
+): boolean {
+  if (statuses.length === 0) return false;
+  const outstanding = statuses.some(
+    (s) => s === "pending" || s === "processing",
+  );
+  return outstanding || !hasContext;
+}
+
+/** Compute the `scraping` flag for a page of prospects in two bounded queries. */
+async function scrapingFlags(
+  prospectIds: string[],
+): Promise<Map<string, boolean>> {
+  const flags = new Map<string, boolean>();
+  if (prospectIds.length === 0) return flags;
+
+  const assets = await db
+    .select({
+      prospectId: schema.prospectAssets.prospectId,
+      status: schema.prospectAssets.status,
+    })
+    .from(schema.prospectAssets)
+    .where(inArray(schema.prospectAssets.prospectId, prospectIds));
+
+  const contexts = await db
+    .select({ prospectId: schema.prospectContext.prospectId })
+    .from(schema.prospectContext)
+    .where(inArray(schema.prospectContext.prospectId, prospectIds));
+  const hasContext = new Set(contexts.map((c) => c.prospectId));
+
+  const byProspect = new Map<string, ProspectAsset["status"][]>();
+  for (const asset of assets) {
+    const list = byProspect.get(asset.prospectId) ?? [];
+    list.push(asset.status);
+    byProspect.set(asset.prospectId, list);
+  }
+
+  for (const id of prospectIds) {
+    flags.set(id, deriveScraping(byProspect.get(id) ?? [], hasContext.has(id)));
+  }
+  return flags;
 }
 
 async function recordAnalytics(
@@ -103,7 +161,7 @@ async function enqueueProspectAssetScrape(
 export async function listProspects(
   userId: string,
   query: ListQuery = {},
-): Promise<CursorPage<Prospect>> {
+): Promise<CursorPage<ProspectListItem>> {
   const limit = clampLimit(query.limit);
   const search = query.q?.trim();
   const keyset = keysetBefore(
@@ -131,7 +189,12 @@ export async function listProspects(
     .orderBy(desc(schema.prospects.createdAt), desc(schema.prospects.id))
     .limit(limit + 1);
 
-  return toPage(rows, limit);
+  const page = toPage(rows, limit);
+  const flags = await scrapingFlags(page.items.map((p) => p.id));
+  return {
+    items: page.items.map((p) => ({ ...p, scraping: flags.get(p.id) ?? false })),
+    nextCursor: page.nextCursor,
+  };
 }
 
 export async function getProspect(
@@ -157,7 +220,12 @@ export async function getProspect(
     .from(schema.prospectContext)
     .where(eq(schema.prospectContext.prospectId, id));
 
-  return { ...prospect, assets, context: context ?? null };
+  const scraping = deriveScraping(
+    assets.map((a) => a.status),
+    Boolean(context),
+  );
+
+  return { ...prospect, assets, context: context ?? null, scraping };
 }
 
 export async function createProspect(

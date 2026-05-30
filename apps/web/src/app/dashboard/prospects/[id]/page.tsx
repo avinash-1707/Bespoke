@@ -189,9 +189,23 @@ export default function ProspectDetailPage() {
               </form>
 
               <section className="flex flex-col gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-5">
-                <h2 className="text-sm font-medium text-[var(--text-primary)]">
-                  Research assets
-                </h2>
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-sm font-medium text-[var(--text-primary)]">
+                    Research assets
+                  </h2>
+                  {prospect.data.scraping &&
+                  prospect.data.assets.length > 0 ? (
+                    <span className="flex items-center gap-1.5 text-xs text-[var(--accent-text)]">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      {
+                        prospect.data.assets.filter(
+                          (a) => a.status === "done" || a.status === "failed",
+                        ).length
+                      }
+                      /{prospect.data.assets.length} processed
+                    </span>
+                  ) : null}
+                </div>
 
                 <form onSubmit={handleAddUrlAsset} className="flex flex-col gap-2 sm:flex-row">
                   <Select
@@ -250,9 +264,16 @@ export default function ProspectDetailPage() {
                         key={asset.id}
                         className="flex items-center justify-between gap-2 rounded-md border border-[var(--border-default)] px-3 py-2 text-xs"
                       >
-                        <span className="truncate text-[var(--text-secondary)]">
-                          {asset.assetType.replace(/_/g, " ")}
-                          {asset.url ? ` · ${asset.url}` : ""}
+                        <span className="flex min-w-0 items-center gap-1.5 truncate text-[var(--text-secondary)]">
+                          {asset.status === "processing" ? (
+                            <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-[var(--state-warning)]" />
+                          ) : asset.status === "pending" ? (
+                            <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-[var(--accent-primary)]" />
+                          ) : null}
+                          <span className="truncate">
+                            {asset.assetType.replace(/_/g, " ")}
+                            {asset.url ? ` · ${asset.url}` : ""}
+                          </span>
                         </span>
                         <StatusBadge status={asset.status} />
                       </li>
@@ -269,9 +290,20 @@ export default function ProspectDetailPage() {
                 <h2 className="text-sm font-medium text-[var(--text-primary)]">
                   Consolidated context
                 </h2>
-                <pre className="whitespace-pre-wrap rounded-md bg-[var(--bg-base)] p-4 font-mono text-xs leading-relaxed text-[var(--text-secondary)]">
-                  {prospect.data.context?.mergedContext ?? "Not built yet."}
-                </pre>
+                {prospect.data.context?.mergedContext ? (
+                  <pre className="whitespace-pre-wrap rounded-md bg-[var(--bg-base)] p-4 font-mono text-xs leading-relaxed text-[var(--text-secondary)]">
+                    {prospect.data.context.mergedContext}
+                  </pre>
+                ) : prospect.data.scraping ? (
+                  <p className="flex items-center gap-1.5 rounded-md bg-[var(--bg-base)] p-4 text-xs text-[var(--text-muted)]">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Building context from the assets above…
+                  </p>
+                ) : (
+                  <pre className="whitespace-pre-wrap rounded-md bg-[var(--bg-base)] p-4 font-mono text-xs leading-relaxed text-[var(--text-secondary)]">
+                    Not built yet.
+                  </pre>
+                )}
               </section>
             </div>
 
