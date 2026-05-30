@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useOfferings } from "@/lib/hooks/use-offerings";
 import { usePrompts } from "@/lib/hooks/use-prompts";
 import {
@@ -13,6 +15,10 @@ import {
   useRegenerateMessage,
   type MessageView,
 } from "@/lib/hooks/use-generations";
+import {
+  useConversations,
+  useCreateConversation,
+} from "@/lib/hooks/use-conversations";
 
 /**
  * Message generation panel for a prospect: pick an offering + prompt + tone,
@@ -102,7 +108,29 @@ export function GenerationPanel({ prospectId }: { prospectId: string }) {
           />
         ))}
       </ul>
+
+      <ConversationsList prospectId={prospectId} />
     </section>
+  );
+}
+
+function ConversationsList({ prospectId }: { prospectId: string }) {
+  const conversations = useConversations(prospectId);
+  if (!conversations.data?.length) return null;
+  return (
+    <div>
+      <h3>Conversations</h3>
+      <ul>
+        {conversations.data.map((c) => (
+          <li key={c.id}>
+            <Link href={`/conversations/${c.id}`}>
+              {c.title ?? `Conversation ${c.id.slice(0, 8)}`}
+            </Link>{" "}
+            <span>({c.status})</span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -113,11 +141,13 @@ function MessageItem({
   prospectId: string;
   message: MessageView;
 }) {
+  const router = useRouter();
   const rate = useRateMessage(prospectId);
   const favorite = useFavoriteMessage(prospectId);
   const copy = useCopyMessage(prospectId);
   const remove = useDeleteMessage(prospectId);
   const regenerate = useRegenerateMessage(prospectId);
+  const createConversation = useCreateConversation();
 
   const pending =
     message.generationStatus === "pending" ||
@@ -167,6 +197,18 @@ function MessageItem({
         </button>
         <button type="button" onClick={() => remove.mutate(message.id)}>
           Delete
+        </button>
+        <button
+          type="button"
+          disabled={pending || createConversation.isPending}
+          onClick={() =>
+            createConversation.mutate(message.id, {
+              onSuccess: (conversation) =>
+                router.push(`/conversations/${conversation.id}`),
+            })
+          }
+        >
+          Start conversation
         </button>
       </div>
     </li>

@@ -5,6 +5,7 @@ import {
   QUEUE_NAME,
   type ConsolidateInsightsPayload,
   type GenerateMessagePayload,
+  type GenerateReplyPayload,
   type ScrapeOfferingSourcePayload,
   type ScrapeProspectAssetPayload,
 } from "@bespoke/queue";
@@ -13,6 +14,7 @@ import { scrapeOfferingSource } from "./processors/scrape-offering-source";
 import { scrapeProspectAsset } from "./processors/scrape-prospect-asset";
 import { consolidateInsights } from "./processors/consolidate-insights";
 import { generateMessage } from "./processors/generate-message";
+import { generateReply } from "./processors/generate-reply";
 
 /**
  * Worker bootstrap. Spins up one BullMQ Worker per queue sharing a single
@@ -45,6 +47,8 @@ const generateProcessor: Processor = async (job) => {
   switch (job.name) {
     case JOB_NAME.generateMessage:
       return generateMessage(job as Job<GenerateMessagePayload>);
+    case JOB_NAME.generateReply:
+      return generateReply(job as Job<GenerateReplyPayload>);
     default:
       return notImplemented(job);
   }
