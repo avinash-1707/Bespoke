@@ -15,6 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  ProspectAssetEditor,
+  assetsUploading,
+  draftsToAssets,
+  type AssetDraft,
+} from "@/components/prospects/prospect-asset-editor";
 
 interface ProspectCreateDialogProps {
   open: boolean;
@@ -22,9 +28,10 @@ interface ProspectCreateDialogProps {
 }
 
 /**
- * Minimal prospect creation: identity fields and optional notes. Research
- * assets (LinkedIn screenshot, GitHub, sites) are added later on the prospect
- * detail page, where their scrape status is visible.
+ * Prospect creation: identity fields, optional notes, and research assets
+ * (LinkedIn screenshot, GitHub, sites, any URL) added inline via the asset
+ * editor. Screenshots upload to Cloudinary before submit; URL assets and the
+ * screenshot's file key are sent with the create request.
  */
 export function ProspectCreateDialog({
   open,
@@ -36,6 +43,7 @@ export function ProspectCreateDialog({
   const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
+  const [assets, setAssets] = useState<AssetDraft[]>([]);
 
   useEffect(() => {
     if (!open) return;
@@ -44,10 +52,14 @@ export function ProspectCreateDialog({
     setCompanyName("");
     setEmail("");
     setNotes("");
+    setAssets([]);
   }, [open]);
 
+  const uploading = assetsUploading(assets);
+
   function submit() {
-    if (!name.trim()) return;
+    if (!name.trim() || uploading) return;
+    const assetInputs = draftsToAssets(assets);
     create.mutate(
       {
         name: name.trim(),
@@ -55,6 +67,7 @@ export function ProspectCreateDialog({
         companyName: companyName.trim() || undefined,
         email: email.trim() || undefined,
         notes: notes.trim() || undefined,
+        assets: assetInputs.length > 0 ? assetInputs : undefined,
       },
       { onSuccess: () => onOpenChange(false) },
     );
@@ -66,8 +79,8 @@ export function ProspectCreateDialog({
         <DialogHeader>
           <DialogTitle>New prospect</DialogTitle>
           <DialogDescription>
-            Save who you are reaching out to. Add research assets later from the
-            prospect page.
+            Save who you are reaching out to, and attach any research assets to
+            enrich the outreach.
           </DialogDescription>
         </DialogHeader>
 
@@ -123,6 +136,8 @@ export function ProspectCreateDialog({
               className="resize-none"
             />
           </div>
+
+          <ProspectAssetEditor drafts={assets} setDrafts={setAssets} />
         </div>
 
         <DialogFooter>
@@ -133,9 +148,14 @@ export function ProspectCreateDialog({
           >
             Cancel
           </Button>
-          <Button onClick={submit} disabled={create.isPending || !name.trim()}>
-            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Create
+          <Button
+            onClick={submit}
+            disabled={create.isPending || uploading || !name.trim()}
+          >
+            {create.isPending || uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : null}
+            {uploading ? "Uploading…" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>
