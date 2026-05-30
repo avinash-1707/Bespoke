@@ -51,7 +51,7 @@ export const aiGenerations = pgTable(
 
 /**
  * The message text produced by a generation. Carries user-facing state:
- * favourite flag, copy count, and the tone/angle it was generated with.
+ * favourite flag and copy count.
  */
 export const generatedMessages = pgTable(
   "generated_messages",
@@ -65,8 +65,6 @@ export const generatedMessages = pgTable(
       { onDelete: "set null" },
     ),
     content: text("content").notNull(),
-    tone: text("tone"),
-    angle: text("angle"),
     isFavorite: boolean("is_favorite").notNull().default(false),
     copiedCount: integer("copied_count").notNull().default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),

@@ -1,7 +1,7 @@
 import type { Job } from "bullmq";
 import { eq } from "drizzle-orm";
 import { schema } from "@bespoke/db";
-import { compileProspectContext } from "@bespoke/shared";
+import { compileProspectContext, type StructuredData } from "@bespoke/shared";
 import type { ConsolidateInsightsPayload } from "@bespoke/queue";
 import { db } from "../lib/db";
 import { logger } from "../lib/logger";
@@ -44,7 +44,7 @@ export async function consolidateInsights(
       assetType:
         (row.sourceAssetId && assetTypeById.get(row.sourceAssetId)) || "other_url",
       summary: row.summary ?? "",
-      structuredData: row.structuredData ?? null,
+      structuredData: (row.structuredData as StructuredData | null) ?? null,
     })));
 
     await db

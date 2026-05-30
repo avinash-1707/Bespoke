@@ -42,8 +42,6 @@ export interface GenerateMessagePayload {
   prospectId: string;
   offeringId: string;
   promptId: string;
-  tone?: string;
-  angle?: string;
 }
 
 export interface GenerateReplyPayload {

@@ -7,19 +7,10 @@ import { db } from "../lib/db";
 import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
 import { config } from "../config";
+import { buildMessageSystemPrompt } from "../prompts/system-prompts";
 
-/** Compose the user-message context block from offering + prospect + knobs. */
-function buildPrompt(
-  offeringContext: string,
-  prospectContext: string,
-  tone?: string,
-  angle?: string,
-): string {
-  const knobs = [
-    tone ? `Tone: ${tone}.` : null,
-    angle ? `Angle: ${angle}.` : null,
-  ].filter(Boolean);
-
+/** Compose the user-message context block from offering + prospect context. */
+function buildPrompt(offeringContext: string, prospectContext: string): string {
   return [
     "# Your offering",
     offeringContext,
@@ -27,20 +18,22 @@ function buildPrompt(
     "# The prospect",
     prospectContext,
     "",
-    knobs.length ? `# Constraints\n${knobs.join("\n")}` : "",
-    "",
     "Write a single personalized outreach message to this prospect about the",
-    "offering above. Output only the message body — no preamble, no subject line.",
+    "offering above. Open with one specific hook from the prospect's",
+    "## Recent Activity or ## Talking Points section — reference something only",
+    "true of this person, never a generic compliment. Then connect the offering",
+    "to that hook. Output only the message body — no preamble, no subject line.",
   ]
     .filter(Boolean)
     .join("\n");
 }
 
 /**
- * Generate one outreach message: combine the offering's compiled context, the
- * prompt's system prompt, and the prospect's consolidated context, call the
- * model recorded on the generation, and persist the message plus token/latency
- * metadata. The Postgres generation-job and ai_generation rows track status.
+ * Generate one outreach message: load the offering, prompt, and prospect
+ * context by the IDs on the generation, wrap the prompt's saved system prompt
+ * in the base layer, call the model recorded on the generation, and persist the
+ * message plus token/latency metadata. The Postgres generation-job and
+ * ai_generation rows track status.
  */
 export async function generateMessage(
   job: Job<GenerateMessagePayload>,
@@ -91,8 +84,6 @@ export async function generateMessage(
     const userPrompt = buildPrompt(
       offering.compiledContext ?? "",
       context.mergedContext,
-      job.data.tone,
-      job.data.angle,
     );
 
     const modelSlug = generation.model || config.OPENROUTER_MODEL;
@@ -100,7 +91,7 @@ export async function generateMessage(
     const startedAt = Date.now();
     const { text, usage } = await generateText({
       model: modelFor(modelSlug),
-      system: prompt.systemPrompt,
+      system: buildMessageSystemPrompt(prompt.systemPrompt),
       prompt: userPrompt,
     });
     const latencyMs = Date.now() - startedAt;
@@ -113,8 +104,6 @@ export async function generateMessage(
     await db.insert(schema.generatedMessages).values({
       generationId,
       content: text.trim(),
-      tone: job.data.tone,
-      angle: job.data.angle,
     });
 
     await db

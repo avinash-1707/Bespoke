@@ -7,6 +7,7 @@ import { db } from "../lib/db";
 import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
 import { config } from "../config";
+import { buildReplySystemPrompt } from "../prompts/system-prompts";
 
 /** Render the thread as a labelled transcript for the model. */
 function renderTranscript(
@@ -93,12 +94,18 @@ export async function generateReply(
       .filter(Boolean)
       .join("\n");
 
+    // The original outreach (first assistant turn) anchors the reply's voice.
+    const originalMessage =
+      thread.find((m) => m.role === "assistant")?.content ??
+      thread[0]?.content ??
+      null;
+
     const modelSlug = generation.model || config.OPENROUTER_MODEL;
     log.info("generating reply", { model: modelSlug, threadLen: thread.length });
     const startedAt = Date.now();
     const { text, usage } = await generateText({
       model: modelFor(modelSlug),
-      system: prompt?.systemPrompt ?? "You are a helpful sales assistant.",
+      system: buildReplySystemPrompt(prompt?.systemPrompt, originalMessage),
       prompt: userPrompt,
     });
     const latencyMs = Date.now() - startedAt;

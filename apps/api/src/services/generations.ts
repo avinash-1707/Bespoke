@@ -13,8 +13,6 @@ export interface CreateGenerationInput {
   offeringId: string;
   promptId: string;
   prospectId: string;
-  tone?: string;
-  angle?: string;
 }
 
 /** A generated message with its rating and parent-generation metadata. */
@@ -107,8 +105,6 @@ export async function createGeneration(
     prospectId: input.prospectId,
     offeringId: input.offeringId,
     promptId: input.promptId,
-    tone: input.tone,
-    angle: input.angle,
   });
 
   await db
@@ -289,7 +285,7 @@ export async function deleteMessage(
 
 /**
  * Re-run generation for an existing message using the same inputs (offering,
- * prompt, prospect, tone, angle). Returns null when the message is not owned.
+ * prompt, prospect). Returns null when the message is not owned.
  */
 export async function regenerate(
   userId: string,
@@ -310,7 +306,5 @@ export async function regenerate(
     offeringId: generation.offeringId,
     promptId: generation.promptId,
     prospectId: generation.prospectId,
-    tone: message.tone ?? undefined,
-    angle: message.angle ?? undefined,
   });
 }

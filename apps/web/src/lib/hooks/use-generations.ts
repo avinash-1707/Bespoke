@@ -20,8 +20,6 @@ export interface CreateGenerationInput {
   offeringId: string;
   promptId: string;
   prospectId: string;
-  tone?: string;
-  angle?: string;
 }
 
 /** A single generation with its produced message (null until the worker finishes). */

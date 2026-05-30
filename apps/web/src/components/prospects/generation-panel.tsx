@@ -32,7 +32,6 @@ import {
 } from "@/lib/hooks/use-conversations";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -42,8 +41,8 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 
 /**
- * Message generation for a prospect: pick an offering + prompt + tone, enqueue
- * a generation, and manage the resulting history (rate, favourite, copy,
+ * Message generation for a prospect: pick an offering + prompt, enqueue a
+ * generation, and manage the resulting history (rate, favourite, copy,
  * regenerate, delete, start a conversation). History polls while a generation
  * is in flight (see useMessages).
  */
@@ -53,17 +52,11 @@ export function GenerationPanel({ prospectId }: { prospectId: string }) {
 
   const [offering, setOffering] = useState<PickerOption | null>(null);
   const [prompt, setPrompt] = useState<PickerOption | null>(null);
-  const [tone, setTone] = useState("");
 
   function generate() {
     if (!offering || !prompt) return;
     createGeneration.mutate(
-      {
-        offeringId: offering.id,
-        promptId: prompt.id,
-        prospectId,
-        tone: tone || undefined,
-      },
+      { offeringId: offering.id, promptId: prompt.id, prospectId },
       {
         onSuccess: () => toast.success("Generating message…"),
         onError: (error) => toast.error(error.message),
@@ -108,16 +101,6 @@ export function GenerationPanel({ prospectId }: { prospectId: string }) {
               })}
             />
           </div>
-        </div>
-
-        <div className="mt-4 flex flex-col gap-2">
-          <Label htmlFor="tone">Tone (optional)</Label>
-          <Input
-            id="tone"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-            placeholder="warm, direct, curious…"
-          />
         </div>
 
         <Button
