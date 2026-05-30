@@ -61,6 +61,8 @@
   --lp-accent-deep: #172554;
   --lp-accent-tint: #1e3a8a1a;
   --lp-gold: #b08a4f;
+  --lp-danger: #9f3b32;
+  --lp-danger-tint: #9f3b3214;
 }
 
 /* Expose tokens + next/font faces to Tailwind's utility generator. */
@@ -124,5 +126,76 @@ body {
   .lp-drift,
   .lp-marquee {
     animation: none;
+  }
+}
+
+/*
+ * Submit-button loader (provided "l13" dot design), scaled down for a button
+ * and tinted to the button's text color so it works on any surface. Only
+ * mounted while a request is pending. Under reduced-motion the button renders
+ * a text label instead (see components/auth/submit-button.tsx), so this
+ * loader never freezes mid-frame.
+ */
+.auth-loader {
+  --s: 22px;
+  width: var(--s);
+  aspect-ratio: 2;
+  --_g: currentColor 90%, #0000;
+  background:
+    radial-gradient(farthest-side at bottom, var(--_g)) 0 calc(50% - var(--s) / 16),
+    radial-gradient(farthest-side at top, var(--_g)) 0 calc(50% + var(--s) / 16),
+    radial-gradient(farthest-side at bottom, var(--_g)) 50% calc(50% - var(--s) / 16),
+    radial-gradient(farthest-side at top, var(--_g)) 50% calc(50% + var(--s) / 16),
+    radial-gradient(farthest-side at bottom, var(--_g)) 100% calc(50% - var(--s) / 16),
+    radial-gradient(farthest-side at top, var(--_g)) 100% calc(50% + var(--s) / 16);
+  background-size: 25% 25%;
+  background-repeat: no-repeat;
+  animation: l13 1s infinite linear;
+}
+@keyframes l13 {
+  16.67% {
+    background-position:
+      0 0,
+      0 100%,
+      50% calc(50% - var(--s) / 8),
+      50% calc(50% + var(--s) / 16),
+      100% calc(50% - var(--s) / 16),
+      100% calc(50% + var(--s) / 16);
+  }
+  33.33% {
+    background-position:
+      0 0,
+      0 100%,
+      50% 0,
+      50% 100%,
+      100% calc(50% - var(--s) / 16),
+      100% calc(50% + var(--s) / 16);
+  }
+  50% {
+    background-position:
+      0 0,
+      0 100%,
+      50% 0,
+      50% 100%,
+      100% 0,
+      100% 100%;
+  }
+  66.67% {
+    background-position:
+      0 calc(50% - var(--s) / 16),
+      0 calc(50% + var(--s) / 16),
+      50% 0,
+      50% 100%,
+      100% 0,
+      100% 100%;
+  }
+  83.33% {
+    background-position:
+      0 calc(50% - var(--s) / 16),
+      0 calc(50% + var(--s) / 16),
+      50% calc(50% - var(--s) / 16),
+      50% calc(50% + var(--s) / 16),
+      100% 0,
+      100% 100%;
   }
 }

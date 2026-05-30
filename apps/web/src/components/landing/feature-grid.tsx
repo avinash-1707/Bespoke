@@ -54,13 +54,16 @@ const FEATURES: ReadonlyArray<Feature> = [
 
 export function FeatureGrid() {
   return (
-    <section id="craft" className="border-y border-[var(--lp-line)] bg-[var(--lp-bg-sunk)] py-24">
+    <section
+      id="craft"
+      className="border-y border-(--lp-line) bg-(--lp-bg-sunk) py-24"
+    >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--lp-accent)]">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-(--lp-accent)">
             The craft
           </p>
-          <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold tracking-tight text-[var(--lp-text)] sm:text-5xl">
+          <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold tracking-tight text-(--lp-text) sm:text-5xl">
             Built for people whose words have to do the work.
           </h2>
         </Reveal>
@@ -72,14 +75,14 @@ export function FeatureGrid() {
               delay={(index % 3) * 90}
               className={feature.wide ? "lg:col-span-2" : undefined}
             >
-              <article className="group h-full rounded-xl border border-[var(--lp-line)] bg-[var(--lp-bg-raised)] p-7 transition-transform duration-200 ease-out hover:-translate-y-1">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--lp-accent-tint)] text-[var(--lp-accent)] transition-colors duration-200 group-hover:bg-[var(--lp-accent)] group-hover:text-[var(--lp-text-invert)]">
+              <article className="group h-full rounded-xl border border-(--lp-line) bg-(--lp-bg-raised) p-7 transition-transform duration-200 ease-out hover:-translate-y-1">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-(--lp-accent-tint) text-(--lp-accent) transition-colors duration-200 group-hover:bg-(--lp-accent) group-hover:text-(--lp-text-invert)">
                   <feature.icon className="h-5 w-5" />
                 </span>
-                <h3 className="mt-5 text-lg font-semibold text-[var(--lp-text)]">
+                <h3 className="mt-5 text-lg font-semibold text-(--lp-text)">
                   {feature.title}
                 </h3>
-                <p className="mt-2.5 max-w-md text-sm leading-relaxed text-[var(--lp-text-soft)]">
+                <p className="mt-2.5 max-w-md text-sm leading-relaxed text-(--lp-text-soft)">
                   {feature.body}
                 </p>
               </article>

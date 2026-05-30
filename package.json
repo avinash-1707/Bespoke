@@ -17,6 +17,7 @@
     "db:migrate": "pnpm --filter @bespoke/db migrate"
   },
   "devDependencies": {
+    "dotenv-cli": "^8.0.0",
     "prettier": "^3.4.2",
     "turbo": "^2.9.0",
     "typescript": "^6.0.0"

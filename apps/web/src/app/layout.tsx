@@ -36,6 +36,7 @@ const hankenGrotesk = Hanken_Grotesk({
 export const metadata: Metadata = {
   title: "Bespoke",
   description: "AI-powered personalized outreach dashboard",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({

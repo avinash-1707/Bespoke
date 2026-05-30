@@ -17,45 +17,45 @@ const BESPOKE_LINES: ReadonlyArray<string> = [
 
 export function Comparison() {
   return (
-    <section id="difference" className="bg-[var(--lp-ink-panel)] py-24">
+    <section id="difference" className="bg-(--lp-ink-panel) py-24">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <Reveal>
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-[var(--lp-accent)]">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-(--lp-accent)">
             The difference
           </p>
-          <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold tracking-tight text-[var(--lp-text-invert)] sm:text-5xl">
+          <h2 className="mt-3 max-w-2xl font-display text-4xl font-semibold tracking-tight text-(--lp-text-invert) sm:text-5xl">
             One of these gets deleted. The other gets a reply.
           </h2>
         </Reveal>
 
         <div className="mt-14 grid gap-5 lg:grid-cols-2">
           <Reveal>
-            <article className="flex h-full flex-col rounded-xl border border-[var(--lp-line-invert)] bg-[var(--lp-ink-panel-raised)] p-6">
+            <article className="flex h-full flex-col rounded-xl border border-(--lp-line-invert) bg-(--lp-ink-panel-raised) p-6">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-widest text-[var(--lp-text-invert-soft)]">
+                <span className="text-xs font-medium uppercase tracking-widest text-(--lp-text-invert-soft)">
                   Everyone else
                 </span>
-                <span className="rounded bg-[var(--lp-line-invert)] px-2 py-0.5 text-[11px] text-[var(--lp-text-invert-soft)]">
+                <span className="rounded bg-(--lp-line-invert) px-2 py-0.5 text-[11px] text-(--lp-text-invert-soft)">
                   Mass blast
                 </span>
               </div>
-              <p className="mt-5 font-mono text-[13px] leading-relaxed text-[var(--lp-text-invert-soft)] line-through decoration-[var(--lp-accent)]/40">
+              <p className="mt-5 font-mono text-[13px] leading-relaxed text-(--lp-text-invert-soft) line-through decoration-(--lp-accent)/40">
                 {GENERIC_MESSAGE}
               </p>
             </article>
           </Reveal>
 
           <Reveal delay={120}>
-            <article className="flex h-full flex-col rounded-xl border border-[var(--lp-accent)]/40 bg-[var(--lp-ink-panel-raised)] p-6 shadow-[0_0_0_1px_var(--lp-accent-tint)]">
+            <article className="flex h-full flex-col rounded-xl border border-(--lp-accent)/40 bg-(--lp-ink-panel-raised) p-6 shadow-[0_0_0_1px_var(--lp-accent-tint)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-widest text-[var(--lp-accent)]">
+                <span className="text-xs font-medium uppercase tracking-widest text-(--lp-accent)">
                   Bespoke
                 </span>
-                <span className="rounded bg-[var(--lp-accent)] px-2 py-0.5 text-[11px] font-medium text-[var(--lp-text-invert)]">
+                <span className="rounded bg-(--lp-accent) px-2 py-0.5 text-[11px] font-medium text-(--lp-text-invert)">
                   Made to measure
                 </span>
               </div>
-              <pre className="mt-5 whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-[var(--lp-text-invert)]">
+              <pre className="mt-5 whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-(--lp-text-invert)">
                 {BESPOKE_LINES.join("\n")}
               </pre>
             </article>

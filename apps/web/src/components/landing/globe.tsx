@@ -102,7 +102,7 @@ export function Globe({
 
   return (
     <Canvas
-      className="!absolute inset-0"
+      className="absolute! inset-0"
       dpr={[1, 2]}
       camera={{ position: [0, 0, 3], fov: 70 }}
       gl={{ antialias: true, alpha: true }}

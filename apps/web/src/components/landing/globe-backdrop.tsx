@@ -17,7 +17,7 @@ const Globe = dynamic(() => import("./globe").then((m) => m.Globe), {
 export function GlobeBackdrop() {
   return (
     <div
-      className="pointer-events-none absolute top-1/2 right-4 z-0 aspect-square w-[24rem] -translate-y-1/2 opacity-90 [mask-image:radial-gradient(circle_at_center,black_55%,transparent_72%)] sm:right-6 sm:w-[32rem] lg:right-8 lg:w-[42rem]"
+      className="pointer-events-none absolute top-1/2 right-4 z-0 aspect-square w-[24rem] -translate-y-1/2 opacity-90 mask-[radial-gradient(circle_at_center,black_55%,transparent_72%)] sm:right-6 sm:w-96 lg:right-8 lg:w-2xl"
       aria-hidden="true"
     >
       <Globe />
