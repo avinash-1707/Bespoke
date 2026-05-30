@@ -9,7 +9,7 @@ import {
   type ScrapeProspectAssetPayload,
 } from "@bespoke/queue";
 import { db } from "../lib/db";
-import { scrapeMarkdown } from "../lib/firecrawl";
+import { fetchSourceMarkdown } from "../lib/firecrawl";
 import { deliveryUrl } from "../lib/cloudinary";
 import { model } from "../lib/ai";
 import { queues } from "../lib/queue";
@@ -65,7 +65,7 @@ async function extractFromImage(imageUrl: string): Promise<Insight> {
   return object;
 }
 
-/** URL-backed asset types scraped with Firecrawl. */
+/** URL-backed asset types; github goes via GitHub API, rest via Firecrawl. */
 const URL_ASSET_TYPES = new Set([
   "github",
   "personal_site",
@@ -191,7 +191,7 @@ async function extractAsset(asset: ProspectAsset): Promise<Insight | null> {
     if (!asset.url) {
       throw new Error(`URL asset ${asset.id} has no url`);
     }
-    const markdown = await scrapeMarkdown(asset.url);
+    const markdown = await fetchSourceMarkdown(asset.url);
     return extractFromText(markdown);
   }
 

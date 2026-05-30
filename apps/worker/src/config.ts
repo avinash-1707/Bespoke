@@ -14,6 +14,8 @@ const schema = z.object({
   OPENROUTER_API_KEY: z.string().min(1),
   OPENROUTER_MODEL: z.string().default("anthropic/claude-sonnet-latest"),
   FIRECRAWL_API_KEY: z.string().min(1),
+  // Optional: raises GitHub API rate limit from 60 to 5000 req/hr.
+  GITHUB_TOKEN: z.string().optional(),
   CLOUDINARY_CLOUD_NAME: z.string().min(1),
   CLOUDINARY_API_KEY: z.string().min(1),
   CLOUDINARY_API_SECRET: z.string().min(1),
