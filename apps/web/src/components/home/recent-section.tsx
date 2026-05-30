@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import type { Offering, Prompt, Prospect } from "@bespoke/db";
 import { useOfferingsInfinite } from "@/lib/hooks/use-offerings";
 import { useProspectsInfinite } from "@/lib/hooks/use-prospects";
@@ -19,11 +19,16 @@ const RECENT_COUNT = 4;
 export function RecentSection() {
   return (
     <Tabs defaultValue="offerings" className="w-full">
-      <TabsList>
-        <TabsTrigger value="offerings">Offerings</TabsTrigger>
-        <TabsTrigger value="prospects">Prospects</TabsTrigger>
-        <TabsTrigger value="prompts">Prompts</TabsTrigger>
-      </TabsList>
+      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--text-muted)]">
+          Recent
+        </span>
+        <TabsList>
+          <TabsTrigger value="offerings">Offerings</TabsTrigger>
+          <TabsTrigger value="prospects">Prospects</TabsTrigger>
+          <TabsTrigger value="prompts">Prompts</TabsTrigger>
+        </TabsList>
+      </div>
 
       <TabsContent value="offerings" className="mt-4">
         <RecentOfferings />
@@ -161,15 +166,22 @@ function RecentRow({
   return (
     <Link
       href={href}
-      className="flex items-center justify-between gap-3 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2.5 transition-colors hover:bg-[var(--bg-surface-hover)]"
+      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-2.5 transition-colors hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-hover)]"
     >
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-0.5 origin-top scale-y-0 bg-[var(--accent-primary)] transition-transform duration-200 group-hover:scale-y-100 motion-reduce:transition-none"
+      />
       <div className="min-w-0">
         <p className="truncate text-sm font-medium text-[var(--text-primary)]">
           {title}
         </p>
         <p className="truncate text-xs text-[var(--text-muted)]">{meta}</p>
       </div>
-      {trailing}
+      <div className="flex shrink-0 items-center gap-2">
+        {trailing}
+        <ChevronRight className="h-4 w-4 text-[var(--text-muted)] transition-[transform,color] duration-200 group-hover:text-[var(--accent-text)] motion-safe:group-hover:translate-x-0.5" />
+      </div>
     </Link>
   );
 }

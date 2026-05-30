@@ -23,6 +23,7 @@ export default function OfferingsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
+        eyebrow="Catalog"
         title="Offerings"
         subtitle="What you sell, compiled into context for every message."
         action={

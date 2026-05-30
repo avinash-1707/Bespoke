@@ -7,6 +7,7 @@ export default function DashboardHomePage() {
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
+        eyebrow="Overview"
         title="Home"
         subtitle="Your outreach at a glance."
       />

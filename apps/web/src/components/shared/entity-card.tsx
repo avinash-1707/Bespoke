@@ -57,13 +57,25 @@ export function EntityCard({
       onMouseMove={preview.onMouseMove}
       onMouseLeave={preview.onMouseLeave}
       className={cn(
-        "group relative h-full rounded-lg border bg-[var(--bg-surface)] p-4 transition-colors",
+        "group relative h-full overflow-hidden rounded-lg border bg-[var(--bg-surface)] p-4 shadow-[var(--shadow-card)] transition-[background-color,border-color,box-shadow] duration-200",
         pending
           ? "border-[var(--border-default)] opacity-70"
-          : "border-[var(--border-default)] hover:bg-[var(--bg-surface-hover)]",
+          : "border-[var(--border-default)] hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface-hover)] hover:shadow-[var(--shadow-pop)] motion-safe:transition-[background-color,border-color,box-shadow,transform] motion-safe:hover:-translate-y-0.5",
         selected && "border-[var(--accent-primary)] bg-[var(--accent-subtle)]",
       )}
     >
+      {!pending ? (
+        // Accent rail — wipes in from the top edge on hover (and stays lit when
+        // selected). A quiet "thread" cue that ties the cards to the brand.
+        <span
+          aria-hidden="true"
+          className={cn(
+            "absolute inset-y-0 left-0 w-0.5 origin-top bg-[var(--accent-primary)] transition-transform duration-200 motion-reduce:transition-none",
+            selected ? "scale-y-100" : "scale-y-0 group-hover:scale-y-100",
+          )}
+        />
+      ) : null}
+
       {!pending && selectMode ? (
         <Checkbox
           checked={selected}

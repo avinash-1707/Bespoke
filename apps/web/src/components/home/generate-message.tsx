@@ -54,19 +54,37 @@ export function GenerateMessage() {
   }
 
   return (
-    <section className="rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface-elevated)] p-5">
-      <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-[var(--accent-text)]" />
-        <h2 className="text-sm font-medium text-[var(--text-primary)]">
-          Generate a message
-        </h2>
+    <section className="relative overflow-hidden rounded-xl border border-[var(--border-strong)] bg-[var(--bg-surface-elevated)] p-5 shadow-[var(--shadow-card)] sm:p-6">
+      {/* Accent top edge — marks this as the primary surface of the page. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent-primary)] to-transparent"
+      />
+      {/* Soft thread glow in the corner, echoing the dashboard backdrop. */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-[var(--accent-subtle)] blur-2xl"
+      />
+
+      <div className="relative flex items-center gap-3">
+        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--accent-subtle)] text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-default)]">
+          <Sparkles className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <span className="block font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--accent-text)]">
+            Compose
+          </span>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--text-primary)]">
+            Generate a message
+          </h2>
+        </div>
       </div>
-      <p className="mt-1 text-xs text-[var(--text-muted)]">
+      <p className="relative mt-2 text-xs text-[var(--text-muted)]">
         Pick a prospect, an offering, and a prompt to draft a personalized
         outreach message.
       </p>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="relative mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Field label="Prospect">
           <EntityPicker
             noun="prospect"

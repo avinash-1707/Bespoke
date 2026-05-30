@@ -48,6 +48,9 @@
   --shadow-pop: 0 10px 34px -8px rgba(26, 26, 36, 0.16), 0 2px 6px -2px rgba(26, 26, 36, 0.08);
   --shadow-raise: inset 0 1px 0 0 rgba(255, 255, 255, 0.5), 0 1px 2px 0 rgba(26, 26, 36, 0.16);
   --shadow-accent: 0 6px 18px -6px rgba(99, 102, 241, 0.45);
+
+  /* Hairline of the dashboard backdrop grid (the "drafting table" texture). */
+  --grid-line: rgba(26, 26, 36, 0.045);
 }
 
 .dark {
@@ -71,6 +74,8 @@
   --shadow-pop: 0 14px 44px -10px rgba(0, 0, 0, 0.72), 0 4px 12px -4px rgba(0, 0, 0, 0.55);
   --shadow-raise: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 1px 2px 0 rgba(0, 0, 0, 0.6);
   --shadow-accent: 0 6px 20px -6px rgba(99, 102, 241, 0.55);
+
+  --grid-line: rgba(255, 255, 255, 0.022);
 }
 
 /*
@@ -262,6 +267,35 @@ body {
   .skeleton-shimmer::after {
     animation: none;
   }
+}
+
+/*
+ * Dashboard atmosphere — the signed-in product is a dark technical workspace,
+ * and a flat fill reads as generic. This layered backdrop sits fixed behind the
+ * content: a fine hairline grid (the "drafting table" texture) plus one soft
+ * indigo glow in the top-left — the single accent thread of the brand. Pure
+ * paint, no animation, so reduced-motion is a non-issue. Masked so the grid
+ * fades out before it reaches the bottom and never competes with content.
+ */
+.dashboard-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      120% 85% at 8% -12%,
+      var(--accent-subtle),
+      transparent 58%
+    ),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size:
+    100% 100%,
+    58px 58px,
+    58px 58px;
+  -webkit-mask-image: radial-gradient(135% 95% at 50% 0%, #000 52%, transparent 100%);
+  mask-image: radial-gradient(135% 95% at 50% 0%, #000 52%, transparent 100%);
 }
 
 /*

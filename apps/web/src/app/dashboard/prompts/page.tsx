@@ -23,6 +23,7 @@ export default function PromptsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
+        eyebrow="Library"
         title="Prompts"
         subtitle="Reusable system prompts that shape tone, length, and angle."
         action={

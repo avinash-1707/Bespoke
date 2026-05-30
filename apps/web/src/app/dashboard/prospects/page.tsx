@@ -23,6 +23,7 @@ export default function ProspectsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
+        eyebrow="Pipeline"
         title="Prospects"
         subtitle="The people you are reaching out to and their research context."
         action={

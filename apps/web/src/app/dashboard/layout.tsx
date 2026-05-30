@@ -16,12 +16,14 @@ import { SmoothScroll } from "@/components/shell/smooth-scroll";
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex h-screen overflow-hidden bg-[var(--bg-base)]">
-        <aside className="hidden w-60 shrink-0 border-r border-[var(--border-default)] md:block">
+      <div className="relative flex h-screen overflow-hidden bg-[var(--bg-base)]">
+        <div className="dashboard-atmosphere" aria-hidden="true" />
+
+        <aside className="relative z-10 hidden w-60 shrink-0 border-r border-[var(--border-default)] bg-[var(--bg-base)]/60 backdrop-blur-sm md:block">
           <SidebarContent />
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative z-10 flex min-w-0 flex-1 flex-col">
           <MobileTopBar />
           <SmoothScroll className="flex-1">
             <div className="mx-auto w-full max-w-6xl p-4 sm:p-6">{children}</div>

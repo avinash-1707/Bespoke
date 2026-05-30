@@ -13,6 +13,7 @@ export default function ConversationsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
+        eyebrow="Threads"
         title="Conversations"
         subtitle="Reply threads you have started, from first touch to follow-up."
       />
