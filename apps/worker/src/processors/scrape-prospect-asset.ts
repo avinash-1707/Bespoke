@@ -1,7 +1,6 @@
 import type { Job } from "bullmq";
 import { and, eq, notInArray } from "drizzle-orm";
-import { generateObject } from "ai";
-import { z } from "zod";
+import { generateText, Output } from "ai";
 import { schema, type ProspectAsset } from "@bespoke/db";
 import {
   JOB_NAME,
@@ -14,55 +13,42 @@ import { deliveryUrl } from "../lib/cloudinary";
 import { model } from "../lib/ai";
 import { queues } from "../lib/queue";
 import { logger } from "../lib/logger";
+import {
+  insightSchema,
+  buildPromptForAssetType,
+  buildLinkedInPrompt,
+  type Insight,
+} from "../prompts/prospect-extraction";
 
-/** Fields the LLM extracts from one prospect asset. */
-const insightSchema = z.object({
-  summary: z.string().describe("2-4 sentence summary of who this person is"),
-  structuredData: z
-    .object({
-      role: z.string().nullable(),
-      company: z.string().nullable(),
-      interests: z.array(z.string()).nullable(),
-      recentActivity: z.string().nullable(),
-      talkingPoints: z.array(z.string()).nullable(),
-    })
-    .describe("Structured facts; use null/empty when not stated"),
-});
-
-type Insight = z.infer<typeof insightSchema>;
-
-const PROMPT_INTRO = [
-  "Extract a sales-relevant profile of this prospect from the source below.",
-  "Be concise and factual. Use null for anything not clearly stated.",
-  "Do not invent facts. Focus on details useful for personalized outreach.",
-].join("\n");
-
-/** Extract an insight from scraped markdown (URL assets). */
-async function extractFromText(markdown: string): Promise<Insight> {
-  const { object } = await generateObject({
+/** Extract an insight from scraped markdown using a type-specific prompt. */
+async function extractFromText(
+  markdown: string,
+  assetType: string,
+): Promise<Insight> {
+  const { output } = await generateText({
     model,
-    schema: insightSchema,
-    prompt: [PROMPT_INTRO, "", markdown.slice(0, 12_000)].join("\n"),
+    output: Output.object({ schema: insightSchema }),
+    prompt: buildPromptForAssetType(assetType, markdown),
   });
-  return object;
+  return output;
 }
 
-/** Extract an insight from a screenshot via the model's vision input. */
+/** Extract an insight from a LinkedIn screenshot via the model's vision input. */
 async function extractFromImage(imageUrl: string): Promise<Insight> {
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model,
-    schema: insightSchema,
+    output: Output.object({ schema: insightSchema }),
     messages: [
       {
         role: "user",
         content: [
-          { type: "text", text: PROMPT_INTRO },
+          { type: "text", text: buildLinkedInPrompt() },
           { type: "image", image: new URL(imageUrl) },
         ],
       },
     ],
   });
-  return object;
+  return output;
 }
 
 /** URL-backed asset types; github goes via GitHub API, rest via Firecrawl. */
@@ -192,7 +178,7 @@ async function extractAsset(asset: ProspectAsset): Promise<Insight | null> {
       throw new Error(`URL asset ${asset.id} has no url`);
     }
     const markdown = await fetchSourceMarkdown(asset.url);
-    return extractFromText(markdown);
+    return extractFromText(markdown, asset.assetType);
   }
 
   // notes — nothing to scrape.

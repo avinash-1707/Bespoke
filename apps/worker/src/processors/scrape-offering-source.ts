@@ -1,6 +1,6 @@
 import type { Job } from "bullmq";
 import { eq } from "drizzle-orm";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import type { LanguageModel } from "ai";
 import { z } from "zod";
 import { schema } from "@bespoke/db";
@@ -28,9 +28,9 @@ async function extractOffering(
   markdown: string,
   model: LanguageModel,
 ): Promise<Extraction> {
-  const { object } = await generateObject({
+  const { output } = await generateText({
     model,
-    schema: extractionSchema,
+    output: Output.object({ schema: extractionSchema }),
     prompt: [
       "Extract a B2B sales offering from the website content below.",
       "Be concise and factual. Use null for anything not clearly stated.",
@@ -41,7 +41,7 @@ async function extractOffering(
       markdown.slice(0, 12_000),
     ].join("\n"),
   });
-  return object;
+  return output;
 }
 
 /**
@@ -86,7 +86,10 @@ export async function scrapeOfferingSource(
 
     log.info("scraping url", { url: source.sourceUrl });
     const markdown = await fetchSourceMarkdown(source.sourceUrl);
-    log.info("scrape ok, extracting", { chars: markdown.length, model: modelSlug });
+    log.info("scrape ok, extracting", {
+      chars: markdown.length,
+      model: modelSlug,
+    });
     const extracted = await extractOffering(markdown, model);
     log.info("extraction ok");
 
@@ -116,7 +119,6 @@ export async function scrapeOfferingSource(
         .update(schema.offerings)
         .set({
           description: merged.description,
-          summary: merged.summary,
           targetAudience: merged.targetAudience,
           problemSolved: merged.problemSolved,
           uniqueValueProp: merged.uniqueValueProp,
