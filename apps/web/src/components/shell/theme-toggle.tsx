@@ -15,22 +15,25 @@ export function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  const isDark = resolvedTheme === "dark";
+  // Until mounted, the resolved theme is unknown on the server, so keep every
+  // theme-derived attribute (aria-label, icon) on a single stable default to
+  // avoid a hydration mismatch.
+  const isDark = mounted && resolvedTheme === "dark";
 
   return (
     <button
       type="button"
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      aria-label={
+        !mounted
+          ? "Toggle theme"
+          : isDark
+            ? "Switch to light theme"
+            : "Switch to dark theme"
+      }
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="rounded-md p-2 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-surface-hover)] hover:text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:outline-none"
     >
-      {!mounted ? (
-        <Sun className="h-4 w-4" />
-      ) : isDark ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
   );
 }
