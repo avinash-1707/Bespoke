@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import {
   useInfiniteQuery,
   useMutation,
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import type { Offering, OfferingSource } from "@bespoke/db";
 import type { CursorPage } from "@bespoke/shared";
 import { apiClient } from "../api-client";
+import { isOptimisticId } from "../format";
 import {
   flattenPages,
   listSearchParams,
@@ -55,7 +57,8 @@ function optimisticOffering(input: CreateOfferingInput): Offering {
     uniqueValueProp: input.uniqueValueProp ?? null,
     proofPoints: input.proofPoints ?? null,
     compiledContext: null,
-    status: "draft",
+    // A URL means a background scrape is starting — pulse immediately.
+    status: input.sourceUrl ? "scraping" : "draft",
     createdAt: now,
     updatedAt: now,
   } as Offering;
@@ -82,6 +85,35 @@ export function useOffering(id: string) {
     queryFn: () => apiClient.get<OfferingWithSources>(`/api/offerings/${id}`),
     enabled: Boolean(id),
   });
+}
+
+/**
+ * While an offering is scraping (real row only), poll its detail until the
+ * worker flips it off `scraping`. On that transition, toast the user and
+ * refresh the lists so the card stops pulsing and renders its final status.
+ */
+export function useWatchOfferingScrape(offering: Offering) {
+  const queryClient = useQueryClient();
+  const watching = offering.status === "scraping" && !isOptimisticId(offering.id);
+  const lastStatus = useRef(offering.status);
+
+  const { data } = useQuery({
+    queryKey: offeringKeys.detail(offering.id),
+    queryFn: () =>
+      apiClient.get<OfferingWithSources>(`/api/offerings/${offering.id}`),
+    enabled: watching,
+    refetchInterval: (query) =>
+      query.state.data?.status === "scraping" ? 2500 : false,
+  });
+
+  useEffect(() => {
+    if (!data) return;
+    if (lastStatus.current === "scraping" && data.status !== "scraping") {
+      toast.success(`“${data.name}” is ready`);
+      void queryClient.invalidateQueries({ queryKey: offeringKeys.lists });
+    }
+    lastStatus.current = data.status;
+  }, [data, queryClient]);
 }
 
 export function useCreateOffering() {

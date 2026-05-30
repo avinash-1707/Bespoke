@@ -8,7 +8,7 @@ import { compileOfferingContext } from "@bespoke/shared";
 import type { ScrapeOfferingSourcePayload } from "@bespoke/queue";
 import { config } from "../config";
 import { db } from "../lib/db";
-import { scrapeMarkdown } from "../lib/firecrawl";
+import { fetchSourceMarkdown } from "../lib/firecrawl";
 import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
 
@@ -82,7 +82,7 @@ export async function scrapeOfferingSource(
     const model = modelFor(modelSlug);
 
     log.info("scraping url", { url: source.sourceUrl });
-    const markdown = await scrapeMarkdown(source.sourceUrl);
+    const markdown = await fetchSourceMarkdown(source.sourceUrl);
     log.info("scrape ok, extracting", { chars: markdown.length, model: modelSlug });
     const extracted = await extractOffering(markdown, model);
     log.info("extraction ok");
@@ -133,6 +133,18 @@ export async function scrapeOfferingSource(
       .update(schema.scrapeJobs)
       .set({ status: "failed", error: message })
       .where(jobFilter);
+    // Don't strand the offering in `scraping` — fall back to ready when it
+    // already has user-entered context, otherwise draft.
+    const [stalled] = await db
+      .select()
+      .from(schema.offerings)
+      .where(eq(schema.offerings.id, offeringId));
+    if (stalled?.status === "scraping") {
+      await db
+        .update(schema.offerings)
+        .set({ status: stalled.compiledContext ? "ready" : "draft" })
+        .where(eq(schema.offerings.id, offeringId));
+    }
     throw error;
   }
 }

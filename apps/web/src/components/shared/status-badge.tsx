@@ -19,6 +19,7 @@ const TONE_CLASS: Record<Tone, string> = {
 /** Map an entity/job status string to a semantic tone. */
 const STATUS_TONE: Record<string, Tone> = {
   draft: "muted",
+  scraping: "warning",
   ready: "success",
   done: "success",
   completed: "success",

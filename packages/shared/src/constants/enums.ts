@@ -13,6 +13,8 @@ export type OfferingSourceType =
 
 export const OFFERING_STATUS = {
   draft: "draft",
+  /** A source URL is being scraped + extracted in the background. */
+  scraping: "scraping",
   ready: "ready",
 } as const;
 export type OfferingStatus =

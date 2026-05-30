@@ -143,7 +143,9 @@ export async function createOffering(
       uniqueValueProp: input.uniqueValueProp,
       proofPoints: input.proofPoints,
       compiledContext,
-      status: compiledContext ? "ready" : "draft",
+      // A pending scrape keeps the offering in `scraping` until the worker
+      // fills the fields and flips it to `ready` (or back to draft on failure).
+      status: input.sourceUrl ? "scraping" : compiledContext ? "ready" : "draft",
     })
     .returning();
 
@@ -238,5 +240,15 @@ export async function addOfferingSource(
   if (!existing) return null;
 
   await enqueueOfferingScrape(userId, offeringId, sourceUrl);
+  // Reflect the in-flight scrape so the UI pulses until the worker finishes.
+  await db
+    .update(schema.offerings)
+    .set({ status: "scraping" })
+    .where(
+      and(
+        eq(schema.offerings.id, offeringId),
+        eq(schema.offerings.userId, userId),
+      ),
+    );
   return getOffering(userId, offeringId);
 }
