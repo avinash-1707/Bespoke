@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useDebounce } from "@/lib/hooks/use-debounce";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SearchInput } from "@/components/shared/search-input";
+import { useCursorTooltip } from "@/components/shared/cursor-tooltip";
 
 export interface PickerOption {
   id: string;
@@ -38,6 +39,43 @@ interface EntityPickerProps<T> {
   /** A cursor-list hook; only fetches while the dialog is open (search-driven). */
   useItems: (query: string, enabled: boolean) => InfiniteList<T>;
   toOption: (item: T) => PickerOption;
+  /** Optional cursor-following hover preview per row (e.g. an offering summary). */
+  toPreview?: (item: T) => ReactNode;
+}
+
+/** One selectable row, with an optional cursor-following hover preview. */
+function PickerRow({
+  label,
+  active,
+  preview,
+  onChoose,
+}: {
+  label: string;
+  active: boolean;
+  preview: ReactNode;
+  onChoose: () => void;
+}) {
+  const tip = useCursorTooltip(preview);
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onChoose}
+        onMouseMove={tip.onMouseMove}
+        onMouseLeave={tip.onMouseLeave}
+        className={cn(
+          "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors",
+          active
+            ? "bg-[var(--accent-subtle)] text-[var(--accent-text)]"
+            : "text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]",
+        )}
+      >
+        <span className="truncate">{label}</span>
+        {active ? <Check className="h-4 w-4 shrink-0" /> : null}
+      </button>
+      {tip.tooltip}
+    </li>
+  );
 }
 
 /**
@@ -53,6 +91,7 @@ export function EntityPicker<T>({
   onSelect,
   useItems,
   toOption,
+  toPreview,
 }: EntityPickerProps<T>) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -122,23 +161,14 @@ export function EntityPicker<T>({
               <ul className="flex flex-col gap-1">
                 {list.items.map((item) => {
                   const option = toOption(item);
-                  const active = option.id === selected?.id;
                   return (
-                    <li key={option.id}>
-                      <button
-                        type="button"
-                        onClick={() => choose(option)}
-                        className={cn(
-                          "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors",
-                          active
-                            ? "bg-[var(--accent-subtle)] text-[var(--accent-text)]"
-                            : "text-[var(--text-primary)] hover:bg-[var(--bg-surface-hover)]",
-                        )}
-                      >
-                        <span className="truncate">{option.label}</span>
-                        {active ? <Check className="h-4 w-4 shrink-0" /> : null}
-                      </button>
-                    </li>
+                    <PickerRow
+                      key={option.id}
+                      label={option.label}
+                      active={option.id === selected?.id}
+                      preview={toPreview?.(item)}
+                      onChoose={() => choose(option)}
+                    />
                   );
                 })}
                 <div ref={sentinelRef} aria-hidden className="h-px" />

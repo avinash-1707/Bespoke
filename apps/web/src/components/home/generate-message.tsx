@@ -85,6 +85,16 @@ export function GenerateMessage() {
             onSelect={setOffering}
             useItems={useOfferingsInfinite}
             toOption={(o) => ({ id: o.id, label: o.name })}
+            toPreview={(o) =>
+              o.summary ? (
+                <>
+                  <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
+                    {o.name}
+                  </p>
+                  <p>{o.summary}</p>
+                </>
+              ) : undefined
+            }
           />
         </Field>
         <Field label="Prompt">

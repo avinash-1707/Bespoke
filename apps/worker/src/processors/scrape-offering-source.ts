@@ -15,6 +15,7 @@ import { logger } from "../lib/logger";
 /** Fields the LLM extracts from scraped page content. Null when not stated. */
 const extractionSchema = z.object({
   description: z.string().nullable(),
+  summary: z.string().nullable(),
   targetAudience: z.string().nullable(),
   problemSolved: z.string().nullable(),
   uniqueValueProp: z.string().nullable(),
@@ -34,6 +35,8 @@ async function extractOffering(
       "Extract a B2B sales offering from the website content below.",
       "Be concise and factual. Use null for anything not clearly stated.",
       "Do not invent claims.",
+      "For `summary`, write a 1-2 sentence plain-language overview of what",
+      "this offering is, written for a user skimming a list to recognize it.",
       "",
       markdown.slice(0, 12_000),
     ].join("\n"),
@@ -103,6 +106,7 @@ export async function scrapeOfferingSource(
       const merged = {
         name: offering.name,
         description: offering.description ?? extracted.description,
+        summary: offering.summary ?? extracted.summary,
         targetAudience: offering.targetAudience ?? extracted.targetAudience,
         problemSolved: offering.problemSolved ?? extracted.problemSolved,
         uniqueValueProp: offering.uniqueValueProp ?? extracted.uniqueValueProp,
@@ -112,6 +116,7 @@ export async function scrapeOfferingSource(
         .update(schema.offerings)
         .set({
           description: merged.description,
+          summary: merged.summary,
           targetAudience: merged.targetAudience,
           problemSolved: merged.problemSolved,
           uniqueValueProp: merged.uniqueValueProp,

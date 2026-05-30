@@ -15,6 +15,13 @@
       "when": 1780096308489,
       "tag": "0001_fuzzy_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780167926226,
+      "tag": "0002_dizzy_thunderbolt",
+      "breakpoints": true
     }
   ]
 }

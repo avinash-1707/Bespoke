@@ -33,6 +33,16 @@ export function OfferingCard({ offering, options }: OfferingCardProps) {
       deleting={del.isPending}
       deleteTitle={offering.name}
       pending={pending}
+      hoverPreview={
+        !scraping && offering.summary ? (
+          <>
+            <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)]">
+              {offering.name}
+            </p>
+            <p>{offering.summary}</p>
+          </>
+        ) : undefined
+      }
     >
       {scraping ? (
         // Scraping in flight: pulse with only the name; no status, no details.

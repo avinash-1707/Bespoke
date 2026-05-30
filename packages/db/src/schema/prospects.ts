@@ -59,10 +59,9 @@ export const prospectInsights = pgTable(
     prospectId: uuid("prospect_id")
       .notNull()
       .references(() => prospects.id, { onDelete: "cascade" }),
-    sourceAssetId: uuid("source_asset_id").references(
-      () => prospectAssets.id,
-      { onDelete: "cascade" },
-    ),
+    sourceAssetId: uuid("source_asset_id").references(() => prospectAssets.id, {
+      onDelete: "cascade",
+    }),
     summary: text("summary"),
     structuredData: jsonb("structured_data").$type<Record<string, unknown>>(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

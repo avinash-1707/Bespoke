@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useCursorTooltip } from "./cursor-tooltip";
 
 interface EntityCardProps {
   /** Detail route opened on click when not in select mode. */
@@ -21,6 +22,11 @@ interface EntityCardProps {
   deleteTitle: string;
   /** Optimistic placeholder: non-interactive, dimmed until persisted. */
   pending?: boolean;
+  /**
+   * Optional rich content shown in a cursor-following tooltip while hovering
+   * the card. Suppressed in select mode and for optimistic placeholders.
+   */
+  hoverPreview?: ReactNode;
   children: ReactNode;
 }
 
@@ -40,12 +46,16 @@ export function EntityCard({
   deleting = false,
   deleteTitle,
   pending = false,
+  hoverPreview,
   children,
 }: EntityCardProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const preview = useCursorTooltip(hoverPreview, !pending && !selectMode);
 
   return (
     <div
+      onMouseMove={preview.onMouseMove}
+      onMouseLeave={preview.onMouseLeave}
       className={cn(
         "group relative h-full rounded-lg border bg-[var(--bg-surface)] p-4 transition-colors",
         pending
@@ -93,6 +103,8 @@ export function EntityCard({
       ) : null}
 
       <div className="pointer-events-none relative z-0">{children}</div>
+
+      {preview.tooltip}
 
       <ConfirmDialog
         open={confirmOpen}

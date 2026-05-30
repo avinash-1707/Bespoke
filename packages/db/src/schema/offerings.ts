@@ -17,6 +17,8 @@ export const offerings = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description"),
+    /** Short plain-language summary captured during scrape, shown on card hover. */
+    summary: text("summary"),
     targetAudience: text("target_audience"),
     problemSolved: text("problem_solved"),
     uniqueValueProp: text("unique_value_prop"),
