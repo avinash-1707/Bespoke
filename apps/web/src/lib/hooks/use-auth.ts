@@ -27,8 +27,15 @@ function unwrap<T>(result: { data: T | null; error: { message?: string } | null 
 
 export function useSignUp() {
   return useMutation({
-    mutationFn: async (input: SignUpInput) =>
-      unwrap(await authClient.signUp.email(input)),
+    mutationFn: async (input: SignUpInput) => {
+      unwrap(await authClient.signUp.email(input));
+      return unwrap(
+        await authClient.signIn.email({
+          email: input.email,
+          password: input.password,
+        }),
+      );
+    },
   });
 }
 
