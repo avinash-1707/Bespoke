@@ -10,6 +10,7 @@ import { db } from "../lib/db";
 import { fetchSourceMarkdown } from "../lib/firecrawl";
 import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
+import { enqueueNextPendingSource } from "../lib/offering-chain";
 import {
   buildCombinePrompt,
   buildInitialExtractionPrompt,
@@ -159,7 +160,6 @@ export async function scrapeOfferingSource(
         uniqueValueProp: merged.uniqueValueProp,
         proofPoints: merged.proofPoints,
         compiledContext: compileOfferingContext(merged),
-        status: "ready",
       })
       .where(eq(schema.offerings.id, offeringId));
 
@@ -167,6 +167,15 @@ export async function scrapeOfferingSource(
       .update(schema.scrapeJobs)
       .set({ status: "completed", result: { extracted } })
       .where(jobFilter);
+
+    // Kick off the next queued source (if any). Stay `scraping` while more are
+    // pending so the UI keeps pulsing; flip to `ready` only when the chain ends.
+    const moreWork = await enqueueNextPendingSource(offeringId);
+    await db
+      .update(schema.offerings)
+      .set({ status: moreWork ? "scraping" : "ready" })
+      .where(eq(schema.offerings.id, offeringId));
+    log.info("source merged", { moreWork });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     log.error("scrape-offering-source failed", { error: message });
@@ -174,17 +183,21 @@ export async function scrapeOfferingSource(
       .update(schema.scrapeJobs)
       .set({ status: "failed", error: message })
       .where(jobFilter);
-    // Don't strand the offering in `scraping` — fall back to ready when it
-    // already has user-entered context, otherwise draft.
-    const [stalled] = await db
-      .select()
-      .from(schema.offerings)
-      .where(eq(schema.offerings.id, offeringId));
-    if (stalled?.status === "scraping") {
-      await db
-        .update(schema.offerings)
-        .set({ status: stalled.compiledContext ? "ready" : "draft" })
+    // One bad URL must not strand the rest of the chain — try the next source.
+    const moreWork = await enqueueNextPendingSource(offeringId);
+    if (!moreWork) {
+      // Nothing left: don't leave the offering stuck in `scraping`. Fall back to
+      // ready when it has context, otherwise draft.
+      const [stalled] = await db
+        .select()
+        .from(schema.offerings)
         .where(eq(schema.offerings.id, offeringId));
+      if (stalled?.status === "scraping") {
+        await db
+          .update(schema.offerings)
+          .set({ status: stalled.compiledContext ? "ready" : "draft" })
+          .where(eq(schema.offerings.id, offeringId));
+      }
     }
     throw error;
   }
