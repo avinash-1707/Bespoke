@@ -8,6 +8,7 @@ import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
 import { config } from "../config";
 import { buildMessageSystemPrompt } from "../prompts/system-prompts";
+import { cleanGeneratedText } from "../lib/text";
 
 /** Compose the user-message context block from offering + prospect context. */
 function buildPrompt(offeringContext: string, prospectContext: string): string {
@@ -30,10 +31,10 @@ function buildPrompt(offeringContext: string, prospectContext: string): string {
 
 /**
  * Generate one outreach message: load the offering, prompt, and prospect
- * context by the IDs on the generation, wrap the prompt's saved system prompt
- * in the base layer, call the model recorded on the generation, and persist the
- * message plus token/latency metadata. The Postgres generation-job and
- * ai_generation rows track status.
+ * context by the IDs on the generation, wrap the prompt's saved customization
+ * instructions in the base layer, call the model recorded on the generation,
+ * and persist the message plus token/latency metadata. The Postgres
+ * generation-job and ai_generation rows track status.
  */
 export async function generateMessage(
   job: Job<GenerateMessagePayload>,
@@ -103,7 +104,7 @@ export async function generateMessage(
 
     await db.insert(schema.generatedMessages).values({
       generationId,
-      content: text.trim(),
+      content: cleanGeneratedText(text),
     });
 
     await db

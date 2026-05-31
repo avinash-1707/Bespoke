@@ -27,7 +27,9 @@ Output ONLY the message body. No subject line, no greeting boilerplate beyond a 
 
 /**
  * Compose the outreach system prompt: the always-on base layer plus the user's
- * saved custom prompt (when set), which overrides the defaults on conflict.
+ * saved customization prompt (when set). The customization can steer tone,
+ * length, angle, and emphasis, but cannot override factuality, concrete-hook,
+ * plain-language, or soft-close requirements.
  */
 export function buildMessageSystemPrompt(
   userSystemPrompt: string | null | undefined,
@@ -37,7 +39,15 @@ export function buildMessageSystemPrompt(
   return `${BASE_MESSAGE_SYSTEM_PROMPT}
 
 ---
-The following are the user's own instructions for this message. Follow them over the defaults above wherever they conflict — tone, length, what to open and close with, what to emphasise, and what to avoid:
+The following are the user's own customization instructions for this message.
+
+Use them to steer tone, length, angle, emphasis, and any additional things to avoid. If they conflict with the non-negotiable rules above, ignore the conflicting part and keep the baseline rule:
+- Use only facts present in the context block.
+- Open with one concrete, prospect-specific hook from Recent Activity or Talking Points when one is available.
+- Connect the offering to that hook instead of listing features.
+- Use plain human language, with no jargon or hype phrases.
+- Never use em dashes.
+- Close softly. Never use a hard meeting ask, "book a call" demand, or "hop on a quick call" phrasing.
 
 ${userSystemPrompt.trim()}`;
 }

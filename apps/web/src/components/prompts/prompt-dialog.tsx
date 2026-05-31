@@ -5,10 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { Prompt } from "@bespoke/db";
-import {
-  useCreatePrompt,
-  useUpdatePrompt,
-} from "@/lib/hooks/use-prompts";
+import { useCreatePrompt, useUpdatePrompt } from "@/lib/hooks/use-prompts";
 import {
   Dialog,
   DialogContent,
@@ -49,7 +46,11 @@ interface PendingDraft {
  * draft: the editor stays the source of truth, and generated drafts are saved
  * exactly like hand-written prompts.
  */
-export function PromptDialog({ open, onOpenChange, prompt }: PromptDialogProps) {
+export function PromptDialog({
+  open,
+  onOpenChange,
+  prompt,
+}: PromptDialogProps) {
   const isEdit = Boolean(prompt);
   const create = useCreatePrompt();
   const update = useUpdatePrompt(prompt?.id ?? "");
@@ -89,7 +90,11 @@ export function PromptDialog({ open, onOpenChange, prompt }: PromptDialogProps) 
   }
 
   function submit() {
-    const input = { name: name.trim(), systemPrompt: systemPrompt.trim(), isDefault };
+    const input = {
+      name: name.trim(),
+      systemPrompt: systemPrompt.trim(),
+      isDefault,
+    };
     if (!input.name || !input.systemPrompt) return;
     const onSuccess = () => onOpenChange(false);
     if (isEdit) update.mutate(input, { onSuccess });
@@ -108,8 +113,8 @@ export function PromptDialog({ open, onOpenChange, prompt }: PromptDialogProps) 
           <DialogHeader className="shrink-0">
             <DialogTitle>{isEdit ? "Edit prompt" : "New prompt"}</DialogTitle>
             <DialogDescription>
-              A reusable system prompt that sets tone, length, and angle for
-              generated messages.
+              Reusable instructions that customize tone, length, and angle while
+              the baseline outreach rules stay in place.
             </DialogDescription>
           </DialogHeader>
 
@@ -132,7 +137,7 @@ export function PromptDialog({ open, onOpenChange, prompt }: PromptDialogProps) 
                 />
               </div>
               <div className="flex min-h-0 flex-1 flex-col gap-2">
-                <Label htmlFor="prompt-body">System prompt</Label>
+                <Label htmlFor="prompt-body">Prompt instructions</Label>
                 <Textarea
                   id="prompt-body"
                   value={systemPrompt}

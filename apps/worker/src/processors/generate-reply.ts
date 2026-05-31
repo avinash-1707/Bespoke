@@ -8,6 +8,7 @@ import { modelFor } from "../lib/ai";
 import { logger } from "../lib/logger";
 import { config } from "../config";
 import { buildReplySystemPrompt } from "../prompts/system-prompts";
+import { cleanGeneratedText } from "../lib/text";
 
 /** Render the thread as a labelled transcript for the model. */
 function renderTranscript(
@@ -83,7 +84,9 @@ export async function generateReply(
       .orderBy(asc(schema.conversationMessages.createdAt));
 
     const userPrompt = [
-      offering?.compiledContext ? `# Your offering\n${offering.compiledContext}` : "",
+      offering?.compiledContext
+        ? `# Your offering\n${offering.compiledContext}`
+        : "",
       context?.mergedContext ? `# The prospect\n${context.mergedContext}` : "",
       "# Conversation so far",
       renderTranscript(thread),
@@ -101,7 +104,10 @@ export async function generateReply(
       null;
 
     const modelSlug = generation.model || config.OPENROUTER_MODEL;
-    log.info("generating reply", { model: modelSlug, threadLen: thread.length });
+    log.info("generating reply", {
+      model: modelSlug,
+      threadLen: thread.length,
+    });
     const startedAt = Date.now();
     const { text, usage } = await generateText({
       model: modelFor(modelSlug),
@@ -118,7 +124,7 @@ export async function generateReply(
     await db.insert(schema.conversationMessages).values({
       conversationId,
       role: "assistant",
-      content: text.trim(),
+      content: cleanGeneratedText(text),
       metadata: { generationId },
     });
 

@@ -25,7 +25,7 @@ export default function PromptsPage() {
       <PageHeader
         eyebrow="Library"
         title="Prompts"
-        subtitle="Reusable system prompts that shape tone, length, and angle."
+        subtitle="Reusable instructions that customize tone, length, and angle."
         action={
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -56,7 +56,7 @@ export default function PromptsPage() {
         batchDeleting={batchDelete.isPending}
         emptyIcon={Sparkles}
         emptyTitle="No prompts yet"
-        emptyDescription="Write a system prompt once and reuse it across every generation."
+        emptyDescription="Write prompt instructions once and reuse them across every generation."
         emptyAction={
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />

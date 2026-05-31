@@ -3,8 +3,8 @@ import { user } from "./auth";
 import { timestamps } from "./_shared";
 
 /**
- * A reusable system prompt that drives generation. One per user may be the
- * default; `systemPrompt` is sent verbatim as the LLM system message.
+ * A reusable prompt customization that drives generation. One per user may be
+ * the default; `systemPrompt` is wrapped by the worker's base system prompt.
  */
 export const prompts = pgTable(
   "prompts",

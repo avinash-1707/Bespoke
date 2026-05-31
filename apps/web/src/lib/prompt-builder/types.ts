@@ -4,7 +4,7 @@
  * touching any rendering or generation logic.
  */
 
-/** A ready-made system prompt the user can drop in and then edit by hand. */
+/** Ready-made prompt instructions the user can drop in and then edit by hand. */
 export interface PromptTemplate {
   id: string;
   label: string;
@@ -12,7 +12,7 @@ export interface PromptTemplate {
   description: string;
   /** Suggested prompt name, applied only when the name field is still empty. */
   suggestedName: string;
-  /** Returns the full system-prompt boilerplate. Never contains em dashes. */
+  /** Returns prompt-instruction boilerplate. Never contains em dashes. */
   build: () => string;
 }
 
