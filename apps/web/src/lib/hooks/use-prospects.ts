@@ -217,3 +217,20 @@ export function useAddProspectAsset(id: string) {
     onError: (error) => toast.error(error.message),
   });
 }
+
+/** Re-queue a single failed asset's scrape (allowed once per asset). */
+export function useRetryProspectAsset(id: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (assetId: string) =>
+      apiClient.post<ProspectWithDetails>(
+        `/api/prospects/${id}/assets/${assetId}/retry`,
+      ),
+    onSuccess: () => {
+      toast.success("Retrying, processing in the background");
+      void queryClient.invalidateQueries({ queryKey: prospectKeys.detail(id) });
+      void queryClient.invalidateQueries({ queryKey: prospectKeys.lists });
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}

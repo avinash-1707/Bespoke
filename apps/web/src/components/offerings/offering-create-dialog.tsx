@@ -44,14 +44,13 @@ export function OfferingCreateDialog({
 
   function submit() {
     if (!name.trim()) return;
-    create.mutate(
-      {
-        name: name.trim(),
-        description: description.trim() || undefined,
-        sourceUrl: sourceUrl.trim() || undefined,
-      },
-      { onSuccess: () => onOpenChange(false) },
-    );
+    // Optimistic create + close immediately; the hook handles rollback/toast on error.
+    create.mutate({
+      name: name.trim(),
+      description: description.trim() || undefined,
+      sourceUrl: sourceUrl.trim() || undefined,
+    });
+    onOpenChange(false);
   }
 
   return (

@@ -1,5 +1,6 @@
 import {
   index,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -43,6 +44,8 @@ export const prospectAssets = pgTable(
     url: text("url"),
     fileKey: text("file_key"),
     status: text("status").$type<AssetStatus>().notNull().default("pending"),
+    // How many times a failed scrape has been re-queued. Capped at 1 (retry once).
+    retryCount: integer("retry_count").notNull().default(0),
     ...timestamps,
   },
   (table) => [index("prospect_assets_prospect_id_idx").on(table.prospectId)],

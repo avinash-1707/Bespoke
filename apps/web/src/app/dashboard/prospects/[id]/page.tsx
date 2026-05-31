@@ -8,11 +8,12 @@ import {
 } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, RotateCw, Upload } from "lucide-react";
 import type { ProspectAssetType } from "@bespoke/shared";
 import {
   useAddProspectAsset,
   useProspect,
+  useRetryProspectAsset,
   useUpdateProspect,
   type UpdateProspectInput,
 } from "@/lib/hooks/use-prospects";
@@ -47,6 +48,7 @@ export default function ProspectDetailPage() {
   const prospect = useProspect(id);
   const updateProspect = useUpdateProspect(id);
   const addAsset = useAddProspectAsset(id);
+  const retryAsset = useRetryProspectAsset(id);
   const signature = useCloudinarySignature();
 
   const [fields, setFields] = useState<UpdateProspectInput>({});
@@ -275,7 +277,28 @@ export default function ProspectDetailPage() {
                             {asset.url ? ` · ${asset.url}` : ""}
                           </span>
                         </span>
-                        <StatusBadge status={asset.status} />
+                        <span className="flex shrink-0 items-center gap-2">
+                          {asset.status === "failed" &&
+                          asset.retryCount < 1 ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 gap-1 px-2 text-xs"
+                              onClick={() => retryAsset.mutate(asset.id)}
+                              disabled={retryAsset.isPending}
+                            >
+                              {retryAsset.isPending &&
+                              retryAsset.variables === asset.id ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <RotateCw className="h-3 w-3" />
+                              )}
+                              Retry
+                            </Button>
+                          ) : null}
+                          <StatusBadge status={asset.status} />
+                        </span>
                       </li>
                     ))}
                   </ul>

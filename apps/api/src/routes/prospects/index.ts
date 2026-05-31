@@ -7,6 +7,7 @@ import {
   batchDeleteBody,
   createProspectBody,
   listQuery,
+  prospectAssetParams,
   prospectIdParams,
   updateProspectBody,
 } from "./schema";
@@ -98,6 +99,29 @@ export async function prospectRoutes(fastify: FastifyInstance): Promise<void> {
       );
       if (!prospect) return reply.status(404).send(NOT_FOUND);
       return reply.status(202).send({ data: prospect });
+    },
+  );
+
+  app.post(
+    "/:id/assets/:assetId/retry",
+    { schema: { params: prospectAssetParams } },
+    async (request, reply) => {
+      const result = await prospectsService.retryProspectAsset(
+        request.userId,
+        request.params.id,
+        request.params.assetId,
+      );
+      if (result.ok) return reply.status(202).send({ data: result.prospect });
+      if (result.reason === "not_found") {
+        return reply.status(404).send(NOT_FOUND);
+      }
+      return reply.status(409).send({
+        error:
+          result.reason === "not_failed"
+            ? "Asset is not in a failed state"
+            : "Asset has already been retried",
+        code: "RETRY_NOT_ALLOWED",
+      });
     },
   );
 }

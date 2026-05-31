@@ -42,6 +42,11 @@ export const prospectIdParams = z.object({
   id: z.string().uuid(),
 });
 
+export const prospectAssetParams = z.object({
+  id: z.string().uuid(),
+  assetId: z.string().uuid(),
+});
+
 export const listQuery = z.object({
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),

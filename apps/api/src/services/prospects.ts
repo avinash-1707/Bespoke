@@ -312,6 +312,62 @@ export async function deleteManyProspects(
   return deleted.length;
 }
 
+/** Outcome of a retry attempt, so the route can map to the right status code. */
+export type RetryAssetResult =
+  | { ok: true; prospect: ProspectWithDetails }
+  | { ok: false; reason: "not_found" | "not_failed" | "retry_exhausted" };
+
+/**
+ * Re-queue a single failed asset's scrape, at most once. Resets the existing
+ * asset row to `pending`, increments `retryCount`, and enqueues a fresh
+ * scrape job against the same asset id. Guards ownership, the `failed` status,
+ * and the one-retry cap.
+ */
+export async function retryProspectAsset(
+  userId: string,
+  prospectId: string,
+  assetId: string,
+): Promise<RetryAssetResult> {
+  const existing = await getProspect(userId, prospectId);
+  if (!existing) return { ok: false, reason: "not_found" };
+
+  const asset = existing.assets.find((a) => a.id === assetId);
+  if (!asset) return { ok: false, reason: "not_found" };
+  if (asset.status !== "failed") return { ok: false, reason: "not_failed" };
+  if (asset.retryCount >= 1) return { ok: false, reason: "retry_exhausted" };
+
+  await db
+    .update(schema.prospectAssets)
+    .set({ status: "pending", retryCount: asset.retryCount + 1 })
+    .where(eq(schema.prospectAssets.id, assetId));
+
+  const [job] = await db
+    .insert(schema.scrapeJobs)
+    .values({
+      userId,
+      jobType: JOB_NAME.scrapeProspectAsset,
+      status: "pending",
+      input: { assetId, prospectId },
+      queueName: QUEUE_NAME.scrape,
+      prospectId,
+    })
+    .returning();
+
+  const bullmqJobId = await enqueueJob(queues, JOB_NAME.scrapeProspectAsset, {
+    assetId,
+    prospectId,
+    userId,
+  });
+
+  await db
+    .update(schema.scrapeJobs)
+    .set({ bullmqJobId })
+    .where(eq(schema.scrapeJobs.id, job!.id));
+
+  const prospect = await getProspect(userId, prospectId);
+  return { ok: true, prospect: prospect! };
+}
+
 /**
  * Attach one asset to an existing prospect and kick off its scrape. Returns
  * null when the prospect is not owned by the user.

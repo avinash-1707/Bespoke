@@ -1,16 +1,17 @@
 import type { Job } from "bullmq";
 import { and, eq, notInArray } from "drizzle-orm";
-import { generateText, Output } from "ai";
+import { generateText, Output, type LanguageModel } from "ai";
 import { schema, type ProspectAsset } from "@bespoke/db";
 import {
   JOB_NAME,
   enqueueJob,
   type ScrapeProspectAssetPayload,
 } from "@bespoke/queue";
+import { config } from "../config";
 import { db } from "../lib/db";
 import { fetchSourceMarkdown } from "../lib/firecrawl";
 import { deliveryUrl } from "../lib/cloudinary";
-import { model } from "../lib/ai";
+import { modelFor } from "../lib/ai";
 import { queues } from "../lib/queue";
 import { logger } from "../lib/logger";
 import {
@@ -24,6 +25,7 @@ import {
 async function extractFromText(
   markdown: string,
   assetType: string,
+  model: LanguageModel,
 ): Promise<Insight> {
   const { output } = await generateText({
     model,
@@ -34,7 +36,10 @@ async function extractFromText(
 }
 
 /** Extract an insight from a LinkedIn screenshot via the model's vision input. */
-async function extractFromImage(imageUrl: string): Promise<Insight> {
+async function extractFromImage(
+  imageUrl: string,
+  model: LanguageModel,
+): Promise<Insight> {
   const { output } = await generateText({
     model,
     output: Output.object({ schema: insightSchema }),
@@ -123,8 +128,19 @@ export async function scrapeProspectAsset(
       throw new Error(`Prospect asset ${assetId} not found`);
     }
 
-    log.info("extracting asset", { assetType: asset.assetType });
-    const insight = await extractAsset(asset);
+    // Use the user's chosen model (vision + text); fall back to server default.
+    const [settings] = await db
+      .select()
+      .from(schema.userSettings)
+      .where(eq(schema.userSettings.userId, userId));
+    const modelSlug = settings?.generationModel || config.OPENROUTER_MODEL;
+    const model = modelFor(modelSlug);
+
+    log.info("extracting asset", {
+      assetType: asset.assetType,
+      model: modelSlug,
+    });
+    const insight = await extractAsset(asset, model);
     log.info("asset extracted", { hasInsight: insight !== null });
 
     // `notes` assets contribute no insight (free text lives on prospect.notes).
@@ -165,12 +181,15 @@ export async function scrapeProspectAsset(
 }
 
 /** Run the right extraction path for the asset type. */
-async function extractAsset(asset: ProspectAsset): Promise<Insight | null> {
+async function extractAsset(
+  asset: ProspectAsset,
+  model: LanguageModel,
+): Promise<Insight | null> {
   if (asset.assetType === "linkedin_screenshot") {
     if (!asset.fileKey) {
       throw new Error(`Screenshot asset ${asset.id} has no file key`);
     }
-    return extractFromImage(deliveryUrl(asset.fileKey));
+    return extractFromImage(deliveryUrl(asset.fileKey), model);
   }
 
   if (URL_ASSET_TYPES.has(asset.assetType)) {
@@ -178,7 +197,7 @@ async function extractAsset(asset: ProspectAsset): Promise<Insight | null> {
       throw new Error(`URL asset ${asset.id} has no url`);
     }
     const markdown = await fetchSourceMarkdown(asset.url);
-    return extractFromText(markdown, asset.assetType);
+    return extractFromText(markdown, asset.assetType, model);
   }
 
   // notes — nothing to scrape.

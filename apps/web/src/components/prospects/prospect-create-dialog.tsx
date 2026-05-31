@@ -60,17 +60,16 @@ export function ProspectCreateDialog({
   function submit() {
     if (!name.trim() || uploading) return;
     const assetInputs = draftsToAssets(assets);
-    create.mutate(
-      {
-        name: name.trim(),
-        jobTitle: jobTitle.trim() || undefined,
-        companyName: companyName.trim() || undefined,
-        email: email.trim() || undefined,
-        notes: notes.trim() || undefined,
-        assets: assetInputs.length > 0 ? assetInputs : undefined,
-      },
-      { onSuccess: () => onOpenChange(false) },
-    );
+    // Optimistic create + close immediately; the hook handles rollback/toast on error.
+    create.mutate({
+      name: name.trim(),
+      jobTitle: jobTitle.trim() || undefined,
+      companyName: companyName.trim() || undefined,
+      email: email.trim() || undefined,
+      notes: notes.trim() || undefined,
+      assets: assetInputs.length > 0 ? assetInputs : undefined,
+    });
+    onOpenChange(false);
   }
 
   return (
