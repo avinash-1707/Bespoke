@@ -1,4 +1,4 @@
-import { createCipheriv, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { config } from "../config";
 
 /**
@@ -24,4 +24,18 @@ export function encryptSecret(plaintext: string): string {
     tag.toString("base64"),
     ciphertext.toString("base64"),
   ].join(":");
+}
+
+/** Decrypt an `iv:tag:cipher` (base64) payload produced by `encryptSecret`. */
+export function decryptSecret(payload: string): string {
+  const [ivB64, tagB64, cipherB64] = payload.split(":");
+  if (!ivB64 || !tagB64 || !cipherB64) {
+    throw new Error("Malformed encrypted secret");
+  }
+  const decipher = createDecipheriv(ALGORITHM, KEY, Buffer.from(ivB64, "base64"));
+  decipher.setAuthTag(Buffer.from(tagB64, "base64"));
+  return Buffer.concat([
+    decipher.update(Buffer.from(cipherB64, "base64")),
+    decipher.final(),
+  ]).toString("utf8");
 }

@@ -51,7 +51,7 @@ export function InlineExplainer({
 
   return (
     <Popover
-      onOpenChange={(open) => {
+      onOpenChange={(open: boolean) => {
         // Reset between opens so a stale answer never lingers.
         if (!open) {
           setAiText(null);

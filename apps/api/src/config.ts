@@ -21,9 +21,11 @@ const schema = z.object({
     message: "ENCRYPTION_KEY must be 64 hex characters (32 bytes)",
   }),
   WEB_ORIGIN: z.string().url().default("http://localhost:3000"),
-  // Platform OpenRouter key for the inline "explain" helpers. These run on a
-  // free model, so they never touch a user's own key.
+  // Platform OpenRouter key. Used for the inline "explain" helpers when the
+  // user has no key of their own (free model), mirroring the worker.
   OPENROUTER_API_KEY: z.string().min(1),
+  // Fallback model slug when the user has not chosen one (matches the worker).
+  OPENROUTER_MODEL: z.string().default("anthropic/claude-sonnet-latest"),
   CLOUDINARY_CLOUD_NAME: z.string().min(1),
   CLOUDINARY_API_KEY: z.string().min(1),
   CLOUDINARY_API_SECRET: z.string().min(1),

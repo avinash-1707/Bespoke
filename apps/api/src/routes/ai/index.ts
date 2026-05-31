@@ -18,7 +18,11 @@ export async function aiRoutes(fastify: FastifyInstance): Promise<void> {
     { schema: { body: explainBody } },
     async (request) => ({
       data: {
-        text: await aiService.explain(request.body.topic, request.body.draft),
+        text: await aiService.explain(
+          request.userId,
+          request.body.topic,
+          request.body.draft,
+        ),
       },
     }),
   );

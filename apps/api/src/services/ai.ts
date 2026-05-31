@@ -1,5 +1,7 @@
 import { generateText } from "ai";
-import { explainModel } from "../lib/ai";
+import { config } from "../config";
+import { modelFor, modelForUser } from "../lib/ai";
+import { getSettings, getUserOpenRouterKey } from "./settings";
 
 /** Subjects the inline explainer can speak to. */
 export type ExplainTopic = "offering" | "prompt";
@@ -15,11 +17,15 @@ const TOPIC_BRIEF: Record<ExplainTopic, string> = {
 /**
  * Generates a short, plain-language explanation for an offering or prompt. When
  * a `draft` is supplied the model reviews it and gives specific, actionable
- * feedback; otherwise it explains the concept and how to write a good one. Runs
- * on the free platform model — the web side keeps a static fallback so the
- * helper degrades gracefully if this call fails.
+ * feedback; otherwise it explains the concept and how to write a good one.
+ *
+ * Model and key resolution mirrors the worker: the call runs on the user's
+ * chosen generation model and their own OpenRouter key when present, falling
+ * back to the configured model and the platform key otherwise. The web side
+ * keeps a static fallback so the helper degrades gracefully on failure.
  */
 export async function explain(
+  userId: string,
   topic: ExplainTopic,
   draft: string | undefined,
 ): Promise<string> {
@@ -36,8 +42,12 @@ export async function explain(
     ? `Here is the user's current ${topic} draft:\n\n"""\n${trimmed}\n"""\n\nReview it. In two or three short sentences, say what is strong and what concrete detail to add to make generated messages better. Be specific to this draft.`
     : `Explain what a good ${topic} is and one practical tip for writing one, so a first-time user knows what to put here.`;
 
+  const { generationModel } = await getSettings(userId);
+  const modelSlug = generationModel || config.OPENROUTER_MODEL;
+  const userKey = await getUserOpenRouterKey(userId);
+
   const { text } = await generateText({
-    model: explainModel,
+    model: userKey ? modelForUser(modelSlug, userKey) : modelFor(modelSlug),
     system,
     prompt: user,
     temperature: 0.5,

@@ -6,7 +6,7 @@ import {
   type GenerationModel,
 } from "@bespoke/shared";
 import { db } from "../context";
-import { encryptSecret } from "../lib/crypto";
+import { decryptSecret, encryptSecret } from "../lib/crypto";
 import { verifyOpenRouterKey } from "../lib/openrouter";
 
 export interface SettingsView {
@@ -123,4 +123,18 @@ export async function getSettingsRow(
     .from(schema.userSettings)
     .where(eq(schema.userSettings.userId, userId));
   return row ?? null;
+}
+
+/**
+ * The user's own OpenRouter key (decrypted), or null when they have not stored
+ * one. Mirrors the worker's `getUserOpenRouterKey` so server-side AI calls run
+ * on the user's key when present and the platform key otherwise.
+ */
+export async function getUserOpenRouterKey(
+  userId: string,
+): Promise<string | null> {
+  const row = await getSettingsRow(userId);
+  return row?.openrouterApiKeyEncrypted
+    ? decryptSecret(row.openrouterApiKeyEncrypted)
+    : null;
 }
