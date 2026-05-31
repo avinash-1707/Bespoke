@@ -373,32 +373,40 @@ reach the worker with a paid model and no key.
 
 ## Example outputs
 
-> _Filled in after build with real runs: actual inputs and the messages they
-> produced._
-
 **Example 1: initial outreach**
 
-- **Offering:** _<name>_
-- **Prompt:** _<summary: tone, length, constraints>_
-- **Prospect inputs:** _<e.g. GitHub URL + portfolio + LinkedIn screenshot>_
+- **Offering:** Bespoke
+- **Prompt:** Partnership request — ≤90 words, opens with a specific mutual fit, proposes shared upside, soft close. No jargon, no templates.
+- **Prospect inputs:** LinkedIn screenshot + company site (Kakiyo — LinkedIn automation tool)
 - **Generated message:**
   ```
-  <paste real output>
+  Hey Ayush, congrats on migrating Kakiyo's data from Appwrite to PlanetScale with zero downtime.
+
+  Since you are scaling your LinkedIn automation, I wondered if you've thought about adding
+  background web scraping or vision-reading to your messaging engine. We built Bespoke to
+  handle this context-gathering automatically.
+
+  Open to seeing if there is a way to partner and plug this into Kakiyo?
   ```
 
-**Example 2: reply handling**
+**Example 2: same prospect, different prompt** (shows prompt customization changing the angle)
 
-- **Prospect reply:** _<paste>_
-- **Generated follow-up:**
+- **Prompt A** — Partnership request, ≤90 words, partnership framing:
   ```
-  <paste real output>
+  Hey Ayush, congrats on migrating Kakiyo's data from Appwrite to PlanetScale with zero downtime.
+
+  Since you are scaling your LinkedIn automation, I wondered if you've thought about adding
+  background web scraping or vision-reading to your messaging engine. We built Bespoke to
+  handle this context-gathering automatically.
+
+  Open to seeing if there is a way to partner and plug this into Kakiyo?
   ```
-
-**Example 3: same prospect, different prompt** (shows customization changing
-output)
-
-- **Prompt A output:** `<paste>`
-- **Prompt B output:** `<paste>`
+- **Prompt B** — LinkedIn note, ≤60 words, curiosity-first, lighter touch:
+  ```
+  Hey Ayush, how has the reception been for MemContext among the Cursor and Claude communities?
+  We are tackling context for sales at Bespoke, using background scraping to help teams run
+  natural reply flows. Let me know if you are open to swapping notes on memory layers.
+  ```
 
 ---
 
