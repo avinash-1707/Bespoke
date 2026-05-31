@@ -94,6 +94,8 @@ export async function generateMessage(
       model: modelFor(modelSlug),
       system: buildMessageSystemPrompt(prompt.systemPrompt),
       prompt: userPrompt,
+      // Outreach copy needs natural variation; too low reads formulaic.
+      temperature: 0.8,
     });
     const latencyMs = Date.now() - startedAt;
     log.info("message generated", {

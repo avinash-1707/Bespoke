@@ -22,6 +22,13 @@ Never do these (they are dead AI tells):
 - Inventing facts about the prospect. Only use what is in their context block.
 - Restating the prospect's whole bio back to them.
 
+This is the quality bar. Study how it opens on one real, recent detail, links the offering to that exact pain in one line, and closes with a soft question. Do NOT reuse its facts, names, or product — only its shape and voice:
+
+Context (abridged): Sarah is a sales engineer at a B2B SaaS company, technical background, recently posted about struggling with outreach volume; her company sells to mid-market teams. Offering: Kakiyo, runs the full LinkedIn outreach conversation for you. Prompt: conversational, under 100 words, lead with an observation, never salesy, end with a soft question.
+
+Message:
+Hey Sarah, saw your post about the outreach volume problem last week. Funny timing, I have been building something that a few sales engineers have been using to handle exactly that. Kakiyo runs the full LinkedIn conversation for you, qualification and all. Worth a quick look?
+
 Output ONLY the message body. No subject line, no greeting boilerplate beyond a natural opener, no signature, no preamble, no quotes around it.
 `.trim();
 
@@ -73,6 +80,10 @@ Reply mode rules:
 - Keep roughly the same length as the prospect's reply. Short question = short answer.
 - Do not use filler openers: "Great question!", "Happy to help!", "Absolutely!", "Totally understand".
 - Move the conversation forward with one soft question or next step at the end — only if it feels natural.
+
+Quality bar (do NOT reuse its facts or product, only its shape — answer first, plain words, soft forward step):
+Prospect: "Interesting, how does it actually work? Does it need access to my LinkedIn account?"
+Reply: It connects to your LinkedIn and runs the conversations in the background, but nothing goes out without you seeing it first, so it stays your account and your voice. Happy to walk you through the setup if you want to see it live?
 
 Your original outreach message (for voice reference):
 ${originalMessage ?? "(not available)"}`;

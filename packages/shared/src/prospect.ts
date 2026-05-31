@@ -34,39 +34,63 @@ const ASSET_TYPE_LABEL: Record<ProspectAssetType, string> = {
   notes: "Notes",
 };
 
+/** Caps that keep the merged block tight when a prospect has many assets. */
+const RECENT_ACTIVITY_CAP = 3;
+const TALKING_POINTS_CAP = 5;
+
 /**
- * Collect every recentActivity value across insights and deduplicate.
- * Recent activity is the single highest-value personalisation hook, so it is
- * pulled out to its own top-level section. Returns null when none found.
+ * Normalise a value into a dedup key: lowercased, whitespace-collapsed, with
+ * trailing punctuation stripped. Catches near-duplicates that a raw `Set` of
+ * the original strings would miss (e.g. "Posted about outreach" vs "Posted
+ * about outreach.").
  */
-function collectRecentActivity(insights: ProspectInsightInput[]): string | null {
-  const activities = insights
-    .map((i) => i.structuredData?.recentActivity)
-    .filter((a): a is string => Boolean(a?.trim()));
-  if (!activities.length) return null;
-  return [...new Set(activities)].join("\n- ");
+function normaliseKey(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[.,;:!?]+$/g, "");
 }
 
 /**
- * Collect every talkingPoint across insights, deduplicate, and cap at 5.
- * Returns null when none found.
+ * Deduplicate display strings by their normalised key, preserving the first
+ * occurrence's original casing/wording and input order. Blank values dropped.
+ */
+function dedupe(values: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const value of values) {
+    const trimmed = value?.trim();
+    if (!trimmed) continue;
+    const key = normaliseKey(trimmed);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(trimmed);
+  }
+  return out;
+}
+
+/**
+ * Collect recentActivity across insights, dedup near-duplicates, cap at
+ * {@link RECENT_ACTIVITY_CAP}. Recent activity is the highest-value
+ * personalisation hook, so it is elevated to its own top-level section.
+ */
+function collectRecentActivity(insights: ProspectInsightInput[]): string[] | null {
+  const activities = dedupe(
+    insights.map((i) => i.structuredData?.recentActivity),
+  ).slice(0, RECENT_ACTIVITY_CAP);
+  return activities.length ? activities : null;
+}
+
+/**
+ * Collect talkingPoints across insights, dedup near-duplicates, cap at
+ * {@link TALKING_POINTS_CAP}. Returns null when none found.
  */
 function collectTalkingPoints(insights: ProspectInsightInput[]): string[] | null {
-  const points = insights
-    .flatMap((i) => i.structuredData?.talkingPoints ?? [])
-    .filter((p): p is string => Boolean(p?.trim()));
-  if (!points.length) return null;
-  return [...new Set(points)].slice(0, 5);
-}
-
-/**
- * Render the per-source structured fields. Role/company live in the header and
- * recentActivity/talkingPoints are elevated to their own sections, so only
- * interests render here.
- */
-function renderStructured(data: StructuredData): string {
-  if (data.interests?.length) return `Interests: ${data.interests.join(", ")}`;
-  return "";
+  const points = dedupe(
+    insights.flatMap((i) => i.structuredData?.talkingPoints ?? []),
+  ).slice(0, TALKING_POINTS_CAP);
+  return points.length ? points : null;
 }
 
 /**
@@ -93,7 +117,10 @@ export function compileProspectContext(
 
   // 2. Recent Activity — highest personalisation value, elevated to top-level.
   const recentActivity = collectRecentActivity(insights);
-  if (recentActivity) sections.push(`## Recent Activity\n- ${recentActivity}`);
+  if (recentActivity?.length) {
+    const lines = recentActivity.map((a) => `- ${a}`).join("\n");
+    sections.push(`## Recent Activity\n${lines}`);
+  }
 
   // 3. Talking Points — ready-made hooks the generation prompt opens from.
   const talkingPoints = collectTalkingPoints(insights);
@@ -102,16 +129,32 @@ export function compileProspectContext(
     sections.push(`## Talking Points\n${numbered}`);
   }
 
-  // 4. Per-source background sections.
+  // 4. Per-source background — one section per asset type (multiple assets of
+  // the same type collapse into one), summaries deduped within and across
+  // sections so overlapping bios across LinkedIn/GitHub/site do not repeat.
+  const byType = new Map<ProspectAssetType, ProspectInsightInput[]>();
   for (const insight of insights) {
-    if (!insight.summary && !insight.structuredData) continue;
-    const label = ASSET_TYPE_LABEL[insight.assetType] ?? "Source";
+    const group = byType.get(insight.assetType) ?? [];
+    group.push(insight);
+    byType.set(insight.assetType, group);
+  }
+
+  const seenSummary = new Set<string>();
+  for (const [assetType, group] of byType) {
+    const label = ASSET_TYPE_LABEL[assetType] ?? "Source";
+    const summaries = dedupe(group.map((g) => g.summary)).filter((s) => {
+      const key = normaliseKey(s);
+      if (seenSummary.has(key)) return false;
+      seenSummary.add(key);
+      return true;
+    });
+    const interests = dedupe(
+      group.flatMap((g) => g.structuredData?.interests ?? []),
+    );
+
     const parts: string[] = [];
-    if (insight.summary?.trim()) parts.push(insight.summary.trim());
-    if (insight.structuredData) {
-      const structured = renderStructured(insight.structuredData);
-      if (structured) parts.push(structured);
-    }
+    if (summaries.length) parts.push(summaries.join("\n\n"));
+    if (interests.length) parts.push(`Interests: ${interests.join(", ")}`);
     if (parts.length) sections.push(`## ${label}\n${parts.join("\n\n")}`);
   }
 

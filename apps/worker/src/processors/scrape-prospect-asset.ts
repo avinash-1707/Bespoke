@@ -31,6 +31,8 @@ async function extractFromText(
     model,
     output: Output.object({ schema: insightSchema }),
     prompt: buildPromptForAssetType(assetType, markdown),
+    // Extraction must be factual, not creative — keep it low.
+    temperature: 0.2,
   });
   return output;
 }
@@ -52,6 +54,8 @@ async function extractFromImage(
         ],
       },
     ],
+    // Extraction must be factual, not creative — keep it low.
+    temperature: 0.2,
   });
   return output;
 }

@@ -40,6 +40,8 @@ async function extractOffering(
       "",
       markdown.slice(0, 12_000),
     ].join("\n"),
+    // Extraction must be factual, not creative — keep it low.
+    temperature: 0.2,
   });
   return output;
 }

@@ -113,6 +113,8 @@ export async function generateReply(
       model: modelFor(modelSlug),
       system: buildReplySystemPrompt(prompt?.systemPrompt, originalMessage),
       prompt: userPrompt,
+      // Match the message generator — natural, human variation over formulaic.
+      temperature: 0.8,
     });
     const latencyMs = Date.now() - startedAt;
     log.info("reply generated", {

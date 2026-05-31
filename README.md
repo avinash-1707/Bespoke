@@ -33,20 +33,23 @@ contextual follow-up that continues the conversation naturally.
    offerings, prompts, prospects, and message history are fully isolated.
 2. **Offering setup** — build an offering by scraping a URL, typing it
    manually, or both (scrape, then edit on top). Raw scraped content is kept
-   separate from your edits so neither is lost. Multiple offerings per user.
-   Inline AI explains what a good offering looks like.
+   separate from your edits so neither is lost. A scrape also produces a short
+   summary surfaced as a card hover preview. Multiple offerings per user.
 3. **Prompt customization** — write and save reusable system prompts that
    drive generation: tone, length, angle, what to emphasize, what to avoid,
-   how to open and close. One can be marked default. Inline AI explains how to
-   write an effective prompt.
+   how to open and close. One can be marked default. A guided **Prompt Builder**
+   (curated templates + a structured form) drafts a prompt for you, editable
+   before save.
 4. **Prospect management** — save a prospect once, reuse across offerings. Add
    any combination of a LinkedIn screenshot, GitHub URL, personal site,
    company site, any other URL, or free-text notes. Each input is scraped or
    vision-read in the background; per-input insights are merged into a single
    consolidated context.
 5. **Message generation** — combine offering + prompt + prospect context into a
-   personalized message. Every generation is saved; rate (1–5), favourite, copy
-   in one click, delete, or regenerate with a different tone — no re-entry.
+   personalized message. The generation model is a per-user setting (Settings
+   modal, strict OpenRouter allow-list). Every generation is saved; rate (1–5),
+   favourite, copy in one click, delete, or regenerate — no re-entry. Generate
+   from the prospect detail page or the Home tab composer.
 6. **Reply handling** — paste a prospect's reply into the conversation thread
    and get a contextual follow-up using the full thread, original prospect
    context, and original offering. The whole thread stays visible.
@@ -221,12 +224,17 @@ pnpm install
 cp .env.example .env
 #   then fill in the values (see the next section)
 
-# 3. Apply database migrations
-pnpm --filter @bespoke/db migrate
+# 3. Apply database migrations (reads ../../.env via dotenv)
+pnpm db:migrate
 
 # 4. Start everything (web + api + worker) via Turborepo
 pnpm dev
 ```
+
+All dev/migrate scripts load the root `.env` (via `dotenv-cli`), so the single
+gitignored `.env` at the repo root feeds every app locally. Production injects
+env vars per service instead. Regenerate migrations after a schema change with
+`pnpm db:generate`.
 
 By default:
 
@@ -272,19 +280,26 @@ Zod-validated `config.ts` — `process.env` is never accessed directly elsewhere
 
 ## How generation works
 
-A message is generated from three inputs, combined deterministically:
+Job payloads carry **IDs only** — web sends the three IDs
+(offering/prompt/prospect), the API enqueues the same IDs, and the **worker
+loads every row by ID and composes the system prompt there**. A message is built
+from three inputs:
 
-- **System prompt** — the user's customized prompt, sent as the LLM system
-  message. Controls tone, length, structure, and constraints.
+- **System prompt** — the worker layers the user's saved prompt on top of a base
+  persona + anti-AI-tell craft layer (`buildMessageSystemPrompt` in
+  `@bespoke/shared`); the user's prompt overrides on conflict. Controls tone,
+  length, structure, and constraints.
 - **Offering** — the selected offering's `compiled_context`, giving the model
   the value proposition to anchor on.
 - **Prospect context** — the consolidated `prospect_context` merged from every
-  scraped URL and vision-read screenshot.
+  scraped URL and vision-read screenshot, with `## Recent Activity` and
+  `## Talking Points` elevated to the top so the model opens on a real hook.
 
 Because the prompt and offering are distinct inputs, changing either one
-meaningfully changes the output — not just cosmetically. Replies reuse the full
-conversation thread plus the original prospect context and offering, so a
-follow-up continues the conversation rather than starting fresh.
+meaningfully changes the output — not just cosmetically. Replies
+(`buildReplySystemPrompt`) reuse the full conversation thread plus the original
+prospect context and offering, anchored to the original outreach, so a follow-up
+continues the conversation rather than starting fresh.
 
 ---
 
@@ -370,8 +385,28 @@ output)
 - A/B comparison view for prompts and offerings on the same prospect.
 - Richer analytics (reply rate by offering, rating trends over time).
 - Background re-scrape and context refresh when a prospect's sources change.
-- Per-user configurable generation model and temperature.
+- Per-user temperature/creativity control (model selection already ships).
+- Inline AI "explain" helpers for the offering and prompt editors.
 - End-to-end tests covering the full scrape → consolidate → generate flow.
+- **RAG over prospect insights for ranking + tight context selection.** Today
+  `consolidate-insights` flattens every per-asset insight into one
+  `prospect_context` blob and the whole thing is handed to the model. That works
+  at small scale but doesn't rank — a prospect with many sources dilutes the
+  strongest hook, and irrelevant detail eats the context window. The upgrade:
+  - **Chunk + embed** each `prospect_insights` row (and offering fields) at
+    consolidation time, store vectors in Postgres via `pgvector` (no new
+    datastore — it's a Postgres extension).
+  - **Retrieve + rank** at generation time: embed a query built from the
+    offering's value prop + prompt intent, pull the top-k most relevant insight
+    chunks by cosine similarity, and feed only those into
+    `buildMessageSystemPrompt` instead of the full blob.
+  - **Score hooks** so `## Recent Activity` / `## Talking Points` are selected by
+    relevance to *this* offering rather than recency alone — different offerings
+    surface different angles from the same prospect.
+  - Keeps generation cost bounded as a prospect accumulates sources, and makes
+    the "close context picking" deterministic and inspectable (you can log which
+    chunks were retrieved for each message). `pgvector` + an embeddings model
+    (OpenRouter already in the stack) is the only new wiring.
 
 ---
 
