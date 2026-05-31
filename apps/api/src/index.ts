@@ -16,6 +16,7 @@ import { generationRoutes } from "./routes/generations/index";
 import { messageRoutes } from "./routes/messages/index";
 import { conversationRoutes } from "./routes/conversations/index";
 import { analyticsRoutes } from "./routes/analytics/index";
+import { aiRoutes } from "./routes/ai/index";
 
 /**
  * Fastify bootstrap. CORS is registered before the auth handler. Zod drives
@@ -63,6 +64,7 @@ async function main(): Promise<void> {
   await app.register(messageRoutes, { prefix: "/api/messages" });
   await app.register(conversationRoutes, { prefix: "/api/conversations" });
   await app.register(analyticsRoutes, { prefix: "/api/analytics" });
+  await app.register(aiRoutes, { prefix: "/api/ai" });
 
   try {
     await app.listen({ port: config.PORT, host: config.HOST });

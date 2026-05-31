@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { InlineExplainer } from "@/components/shared/inline-explainer";
 
 interface OfferingCreateDialogProps {
   open: boolean;
@@ -76,7 +77,14 @@ export function OfferingCreateDialog({
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="offering-description">Description</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="offering-description">Description</Label>
+              <InlineExplainer
+                topic="offering"
+                staticCopy="Your offering is the core value you bring to a prospect. It is what makes your outreach relevant to them specifically: what you do, who you sell to, the problem you solve, and what makes you different. The better your offering is defined, the better every message will be."
+                getDraft={() => description}
+              />
+            </div>
             <Textarea
               id="offering-description"
               value={description}

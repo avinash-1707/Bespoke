@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { InlineExplainer } from "@/components/shared/inline-explainer";
 import { PromptBuilderPanel } from "./prompt-builder-panel";
 
 interface PromptDialogProps {
@@ -137,7 +138,14 @@ export function PromptDialog({
                 />
               </div>
               <div className="flex min-h-0 flex-1 flex-col gap-2">
-                <Label htmlFor="prompt-body">Prompt instructions</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="prompt-body">Prompt instructions</Label>
+                  <InlineExplainer
+                    topic="prompt"
+                    staticCopy="The prompt is the set of instructions you give the AI before it writes a message. It controls how the AI thinks about your prospect and what kind of message it writes. Think of it as briefing a copywriter before they start writing: tone, length, angle, what to emphasize, what to avoid, how to open, and how to close."
+                    getDraft={() => systemPrompt}
+                  />
+                </div>
                 <Textarea
                   id="prompt-body"
                   value={systemPrompt}

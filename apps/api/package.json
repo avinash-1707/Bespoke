@@ -15,6 +15,8 @@
     "@bespoke/queue": "workspace:*",
     "@bespoke/shared": "workspace:*",
     "@fastify/cors": "^11.0.0",
+    "@openrouter/ai-sdk-provider": "^2.9.0",
+    "ai": "^6.0.0",
     "better-auth": "^1.6.0",
     "bullmq": "^5.77.0",
     "cloudinary": "^2.5.0",
