@@ -47,7 +47,10 @@ contextual follow-up that continues the conversation naturally.
    consolidated context.
 5. **Message generation** — combine offering + prompt + prospect context into a
    personalized message. The generation model is a per-user setting (Settings
-   modal, strict OpenRouter allow-list). Every generation is saved; rate (1–5),
+   modal, strict OpenRouter allow-list). Gemini models are free (platform key);
+   starred Anthropic/OpenAI models require the user's own OpenRouter key, stored
+   encrypted (AES-256-GCM) and verified live before saving. Once a key is saved,
+   all of that user's generations run on it. Every generation is saved; rate (1–5),
    favourite, copy in one click, delete, or regenerate — no re-entry. Generate
    from the prospect detail page or the Home tab composer.
 6. **Reply handling** — paste a prospect's reply into the conversation thread
@@ -257,16 +260,21 @@ Zod-validated `config.ts` — `process.env` is never accessed directly elsewhere
 | `REDIS_URL`             | api, worker      | Upstash Redis **TCP** URL (`rediss://…`)       |
 | `BETTER_AUTH_SECRET`    | api              | Session signing secret                         |
 | `BETTER_AUTH_URL`       | api              | Auth base URL                                  |
-| `OPENROUTER_API_KEY`    | worker           | OpenRouter key (the only AI key needed)        |
-| `OPENROUTER_MODEL`      | worker           | Default generation model slug                  |
+| `ENCRYPTION_KEY`        | api, worker      | 64 hex chars (32 bytes); encrypts stored secrets (user OpenRouter key). Must match across api + worker |
+| `OPENROUTER_API_KEY`    | worker           | Platform OpenRouter key (free models + extraction) |
+| `OPENROUTER_MODEL`      | worker           | Default extraction/generation model slug       |
 | `FIRECRAWL_API_KEY`     | worker           | Firecrawl scraping key                         |
 | `CLOUDINARY_CLOUD_NAME` | api, worker      | Cloudinary cloud name (signing + delivery URL) |
 | `CLOUDINARY_API_KEY`    | api              | Cloudinary API key (returned in the signature) |
 | `CLOUDINARY_API_SECRET` | api              | Cloudinary secret for signing — server-only    |
 | `NEXT_PUBLIC_API_URL`   | web              | Fastify API origin                             |
 
-> The Vercel AI SDK is a library — it needs no key of its own. Only
-> `OPENROUTER_API_KEY` is required for all LLM calls.
+> The Vercel AI SDK is a library — it needs no key of its own. The platform
+> `OPENROUTER_API_KEY` covers extraction and free (Gemini) generations; paid
+> models route through each user's own encrypted OpenRouter key.
+>
+> Generate `ENCRYPTION_KEY` with `openssl rand -hex 32`. It must be identical
+> for api and worker, or stored keys cannot be decrypted.
 
 > Upstash must use the **TCP** endpoint with `ioredis`
 > (`maxRetriesPerRequest: null`). The serverless REST SDK (`@upstash/redis`)
@@ -300,6 +308,12 @@ meaningfully changes the output — not just cosmetically. Replies
 (`buildReplySystemPrompt`) reuse the full conversation thread plus the original
 prospect context and offering, anchored to the original outreach, so a follow-up
 continues the conversation rather than starting fresh.
+
+The worker resolves the model per generation: it uses the slug recorded on the
+`ai_generation` row and, if the user has a stored OpenRouter key
+(`getUserOpenRouterKey` → decrypt), runs the call on that key; otherwise it falls
+back to the platform key. The API gates paid-model selection so a user can never
+reach the worker with a paid model and no key.
 
 ---
 

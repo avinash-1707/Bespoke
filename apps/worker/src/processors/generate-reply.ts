@@ -4,7 +4,8 @@ import { generateText } from "ai";
 import { schema } from "@bespoke/db";
 import type { GenerateReplyPayload } from "@bespoke/queue";
 import { db } from "../lib/db";
-import { modelFor } from "../lib/ai";
+import { modelFor, modelForUser } from "../lib/ai";
+import { getUserOpenRouterKey } from "../lib/user-key";
 import { logger } from "../lib/logger";
 import { config } from "../config";
 import { buildReplySystemPrompt } from "../prompts/system-prompts";
@@ -104,13 +105,17 @@ export async function generateReply(
       null;
 
     const modelSlug = generation.model || config.OPENROUTER_MODEL;
+    // When the user has stored their own OpenRouter key, all of their
+    // generations run on it; otherwise fall back to the platform key.
+    const userKey = await getUserOpenRouterKey(userId);
     log.info("generating reply", {
       model: modelSlug,
       threadLen: thread.length,
+      userKey: !!userKey,
     });
     const startedAt = Date.now();
     const { text, usage } = await generateText({
-      model: modelFor(modelSlug),
+      model: userKey ? modelForUser(modelSlug, userKey) : modelFor(modelSlug),
       system: buildReplySystemPrompt(prompt?.systemPrompt, originalMessage),
       prompt: userPrompt,
       // Match the message generator — natural, human variation over formulaic.

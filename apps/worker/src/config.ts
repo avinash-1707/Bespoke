@@ -13,6 +13,11 @@ const schema = z.object({
   REDIS_URL: z.string().url(),
   OPENROUTER_API_KEY: z.string().min(1),
   OPENROUTER_MODEL: z.string().default("anthropic/claude-sonnet-latest"),
+  // 32-byte key (64 hex chars) for decrypting stored secrets (user OpenRouter
+  // key). MUST match the api's ENCRYPTION_KEY.
+  ENCRYPTION_KEY: z.string().regex(/^[0-9a-f]{64}$/i, {
+    message: "ENCRYPTION_KEY must be 64 hex characters (32 bytes)",
+  }),
   FIRECRAWL_API_KEY: z.string().min(1),
   // Optional: raises GitHub API rate limit from 60 to 5000 req/hr.
   GITHUB_TOKEN: z.string().optional(),
