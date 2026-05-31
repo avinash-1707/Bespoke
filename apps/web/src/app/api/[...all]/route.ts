@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+// Server-only — points directly at the Fastify API. Never use NEXT_PUBLIC_API_URL
+// here; in prod that resolves to the web origin which would cause a proxy loop.
 const API_URL = process.env.API_INTERNAL_URL!;
 
 async function handler(req: NextRequest): Promise<NextResponse> {
@@ -18,12 +20,10 @@ async function handler(req: NextRequest): Promise<NextResponse> {
     duplex: "half",
   });
 
-  const response = new NextResponse(upstream.body, {
+  return new NextResponse(upstream.body, {
     status: upstream.status,
     headers: upstream.headers,
   });
-
-  return response;
 }
 
 export const GET = handler;
