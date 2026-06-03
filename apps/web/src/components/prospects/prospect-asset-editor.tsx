@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  type ChangeEvent,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { type ChangeEvent, type Dispatch, type SetStateAction } from "react";
 import {
   Building2,
   Check,
@@ -148,7 +144,11 @@ export function ProspectAssetEditor({
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    patchDraft(id, { uploading: true, fileName: file.name, fileKey: undefined });
+    patchDraft(id, {
+      uploading: true,
+      fileName: file.name,
+      fileKey: undefined,
+    });
     try {
       const sig = await signature.mutateAsync(undefined);
       const { publicId } = await uploadToCloudinary(file, sig);
@@ -172,7 +172,10 @@ export function ProspectAssetEditor({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {ASSET_OPTIONS.map((opt) => (
-              <DropdownMenuItem key={opt.type} onSelect={() => addDraft(opt.type)}>
+              <DropdownMenuItem
+                key={opt.type}
+                onSelect={() => addDraft(opt.type)}
+              >
                 <opt.icon className="h-4 w-4" />
                 {opt.label}
               </DropdownMenuItem>
@@ -226,7 +229,9 @@ export function ProspectAssetEditor({
                 ) : (
                   <Input
                     value={draft.url}
-                    onChange={(e) => patchDraft(draft.id, { url: e.target.value })}
+                    onChange={(e) =>
+                      patchDraft(draft.id, { url: e.target.value })
+                    }
                     placeholder={opt.placeholder}
                     className="flex-1"
                   />

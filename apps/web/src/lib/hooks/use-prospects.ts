@@ -159,7 +159,11 @@ export function useCreateProspect() {
       apiClient.post<ProspectWithDetails>("/api/prospects", input),
     onMutate: async (input): Promise<{ snapshot: ListSnapshot }> => {
       const snapshot = await snapshotLists(queryClient, prospectKeys.lists);
-      prependToLists(queryClient, prospectKeys.lists, optimisticProspect(input));
+      prependToLists(
+        queryClient,
+        prospectKeys.lists,
+        optimisticProspect(input),
+      );
       return { snapshot };
     },
     onError: (error, _input, context) => {

@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { AiGeneration, GeneratedMessage } from "@bespoke/db";
 import { apiClient } from "../api-client";
@@ -30,7 +26,8 @@ export interface GenerationDetail extends AiGeneration {
 }
 
 const generationKeys = {
-  messages: (prospectId: string) => ["generations", "prospect", prospectId] as const,
+  messages: (prospectId: string) =>
+    ["generations", "prospect", prospectId] as const,
   detail: (id: string) => ["generations", "detail", id] as const,
 };
 
@@ -92,9 +89,7 @@ export function useMessages(prospectId: string) {
   return useQuery({
     queryKey: generationKeys.messages(prospectId),
     queryFn: () =>
-      apiClient.get<MessageView[]>(
-        `/api/generations?prospectId=${prospectId}`,
-      ),
+      apiClient.get<MessageView[]>(`/api/generations?prospectId=${prospectId}`),
     enabled: Boolean(prospectId),
     // Poll while any message is still being generated.
     refetchInterval: (query) =>

@@ -18,7 +18,10 @@ export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_PAGE_SIZE = 100;
 
 export function encodeCursor(row: { createdAt: Date; id: string }): string {
-  const payload: Cursor = { createdAt: row.createdAt.toISOString(), id: row.id };
+  const payload: Cursor = {
+    createdAt: row.createdAt.toISOString(),
+    id: row.id,
+  };
   return Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
 }
 

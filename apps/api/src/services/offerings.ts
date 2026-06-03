@@ -226,7 +226,8 @@ export async function createOffering(
       compiledContext,
       // Pending scrapes keep the offering in `scraping` until the worker chain
       // finishes and flips it to `ready` (or back to draft on failure).
-      status: urls.length > 0 ? "scraping" : compiledContext ? "ready" : "draft",
+      status:
+        urls.length > 0 ? "scraping" : compiledContext ? "ready" : "draft",
     })
     .returning();
 

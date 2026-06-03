@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Loader2, RotateCw, Upload } from "lucide-react";
@@ -195,8 +190,7 @@ export default function ProspectDetailPage() {
                   <h2 className="text-sm font-medium text-[var(--text-primary)]">
                     Research assets
                   </h2>
-                  {prospect.data.scraping &&
-                  prospect.data.assets.length > 0 ? (
+                  {prospect.data.scraping && prospect.data.assets.length > 0 ? (
                     <span className="flex items-center gap-1.5 text-xs text-[var(--accent-text)]">
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       {
@@ -209,7 +203,10 @@ export default function ProspectDetailPage() {
                   ) : null}
                 </div>
 
-                <form onSubmit={handleAddUrlAsset} className="flex flex-col gap-2 sm:flex-row">
+                <form
+                  onSubmit={handleAddUrlAsset}
+                  className="flex flex-col gap-2 sm:flex-row"
+                >
                   <Select
                     value={assetType}
                     onValueChange={(v) => setAssetType(v as ProspectAssetType)}
@@ -232,7 +229,10 @@ export default function ProspectDetailPage() {
                     onChange={(e) => setAssetUrl(e.target.value)}
                     className="flex-1"
                   />
-                  <Button type="submit" disabled={addAsset.isPending || !assetUrl.trim()}>
+                  <Button
+                    type="submit"
+                    disabled={addAsset.isPending || !assetUrl.trim()}
+                  >
                     Add
                   </Button>
                 </form>
@@ -285,8 +285,7 @@ export default function ProspectDetailPage() {
                           ) : null}
                         </span>
                         <span className="flex shrink-0 items-center gap-2">
-                          {asset.status === "failed" &&
-                          asset.retryCount < 1 ? (
+                          {asset.status === "failed" && asset.retryCount < 1 ? (
                             <Button
                               type="button"
                               variant="ghost"

@@ -102,8 +102,11 @@ export async function generateReply(
       thread[0]?.content ??
       null;
 
-    const { model, slug: modelSlug, usingUserKey } =
-      await resolveModelForUser(userId, generation.model);
+    const {
+      model,
+      slug: modelSlug,
+      usingUserKey,
+    } = await resolveModelForUser(userId, generation.model);
     log.info("generating reply", {
       model: modelSlug,
       threadLen: thread.length,

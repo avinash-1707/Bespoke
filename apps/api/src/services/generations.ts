@@ -1,9 +1,5 @@
 import { and, desc, eq } from "drizzle-orm";
-import {
-  schema,
-  type AiGeneration,
-  type GeneratedMessage,
-} from "@bespoke/db";
+import { schema, type AiGeneration, type GeneratedMessage } from "@bespoke/db";
 import { JOB_NAME, QUEUE_NAME, enqueueJob } from "@bespoke/queue";
 import { db } from "../context";
 import { queues } from "../queue";
@@ -57,7 +53,10 @@ export async function createGeneration(
       ),
     );
   const [prospect] = await db
-    .select({ id: schema.prospects.id, mergedContext: schema.prospects.mergedContext })
+    .select({
+      id: schema.prospects.id,
+      mergedContext: schema.prospects.mergedContext,
+    })
     .from(schema.prospects)
     .where(
       and(
@@ -112,7 +111,13 @@ export async function createGeneration(
 export async function getGeneration(
   userId: string,
   generationId: string,
-): Promise<(AiGeneration & { message: GeneratedMessage | null; failureReason: string | null }) | null> {
+): Promise<
+  | (AiGeneration & {
+      message: GeneratedMessage | null;
+      failureReason: string | null;
+    })
+  | null
+> {
   const [generation] = await db
     .select()
     .from(schema.aiGenerations)
@@ -134,7 +139,11 @@ export async function getGeneration(
     .from(schema.generationJobs)
     .where(eq(schema.generationJobs.generationId, generationId));
 
-  return { ...generation, message: message ?? null, failureReason: jobRow?.error ?? null };
+  return {
+    ...generation,
+    message: message ?? null,
+    failureReason: jobRow?.error ?? null,
+  };
 }
 
 /** All generated messages for a prospect, newest first — the history list. */
@@ -285,7 +294,11 @@ export async function regenerate(
     .select()
     .from(schema.aiGenerations)
     .where(eq(schema.aiGenerations.id, message.generationId));
-  if (!generation?.offeringId || !generation.promptId || !generation.prospectId) {
+  if (
+    !generation?.offeringId ||
+    !generation.promptId ||
+    !generation.prospectId
+  ) {
     return null;
   }
 

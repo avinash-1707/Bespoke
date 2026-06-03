@@ -13,17 +13,13 @@ export async function aiRoutes(fastify: FastifyInstance): Promise<void> {
   const app = fastify.withTypeProvider<ZodTypeProvider>();
   app.addHook("preHandler", requireAuth);
 
-  app.post(
-    "/explain",
-    { schema: { body: explainBody } },
-    async (request) => ({
-      data: {
-        text: await aiService.explain(
-          request.userId,
-          request.body.topic,
-          request.body.draft,
-        ),
-      },
-    }),
-  );
+  app.post("/explain", { schema: { body: explainBody } }, async (request) => ({
+    data: {
+      text: await aiService.explain(
+        request.userId,
+        request.body.topic,
+        request.body.draft,
+      ),
+    },
+  }));
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Building2, ChevronDown, Package, ScrollText, User } from "lucide-react";
+import {
+  Building2,
+  ChevronDown,
+  Package,
+  ScrollText,
+  User,
+} from "lucide-react";
 import type { ConversationParticipants } from "@bespoke/shared";
 import {
   HoverCard,
@@ -162,16 +168,12 @@ function ParticipantCard({
   );
 }
 
-function DetailHead({
-  title,
-  sub,
-}: {
-  title: string;
-  sub?: string | null;
-}) {
+function DetailHead({ title, sub }: { title: string; sub?: string | null }) {
   return (
     <div className="flex flex-col gap-0.5 border-b border-[var(--border-default)] pb-2">
-      <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
+      <p className="text-sm font-semibold text-[var(--text-primary)]">
+        {title}
+      </p>
       {sub ? (
         <p className="text-xs text-[var(--text-secondary)]">{sub}</p>
       ) : null}

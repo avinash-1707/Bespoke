@@ -55,7 +55,9 @@ function TemplateCard({
         {template.label}
         <ArrowRight className="h-3.5 w-3.5 shrink-0 text-[var(--text-muted)] opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100" />
       </span>
-      <span className="text-xs text-[var(--text-muted)]">{template.description}</span>
+      <span className="text-xs text-[var(--text-muted)]">
+        {template.description}
+      </span>
     </motion.button>
   );
 }

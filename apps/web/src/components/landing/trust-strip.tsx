@@ -23,7 +23,10 @@ export function TrustStrip() {
               className="flex items-center gap-10 whitespace-nowrap text-sm font-medium text-[var(--lp-text-soft)]"
             >
               {phrase}
-              <span className="h-1 w-1 rounded-full bg-[var(--lp-accent)]" aria-hidden="true" />
+              <span
+                className="h-1 w-1 rounded-full bg-[var(--lp-accent)]"
+                aria-hidden="true"
+              />
             </span>
           ))}
         </div>

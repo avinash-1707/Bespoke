@@ -75,7 +75,9 @@ function dedupe(values: Array<string | null | undefined>): string[] {
  * {@link RECENT_ACTIVITY_CAP}. Recent activity is the highest-value
  * personalisation hook, so it is elevated to its own top-level section.
  */
-function collectRecentActivity(insights: ProspectInsightInput[]): string[] | null {
+function collectRecentActivity(
+  insights: ProspectInsightInput[],
+): string[] | null {
   const activities = dedupe(
     insights.map((i) => i.structuredData?.recentActivity),
   ).slice(0, RECENT_ACTIVITY_CAP);
@@ -86,7 +88,9 @@ function collectRecentActivity(insights: ProspectInsightInput[]): string[] | nul
  * Collect talkingPoints across insights, dedup near-duplicates, cap at
  * {@link TALKING_POINTS_CAP}. Returns null when none found.
  */
-function collectTalkingPoints(insights: ProspectInsightInput[]): string[] | null {
+function collectTalkingPoints(
+  insights: ProspectInsightInput[],
+): string[] | null {
   const points = dedupe(
     insights.flatMap((i) => i.structuredData?.talkingPoints ?? []),
   ).slice(0, TALKING_POINTS_CAP);
@@ -111,7 +115,8 @@ export function compileProspectContext(
   // 1. Header — who this person is at a glance.
   const headerLines: string[] = [`# ${prospect.name}`];
   if (prospect.jobTitle) headerLines.push(`Role: ${prospect.jobTitle}`);
-  if (prospect.companyName) headerLines.push(`Company: ${prospect.companyName}`);
+  if (prospect.companyName)
+    headerLines.push(`Company: ${prospect.companyName}`);
   if (prospect.notes) headerLines.push(`Context: ${prospect.notes}`);
   sections.push(headerLines.join("\n"));
 

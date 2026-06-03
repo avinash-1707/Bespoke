@@ -68,11 +68,17 @@ const workers: Worker[] = [
 
 for (const worker of workers) {
   worker.on("active", (job) => {
-    logger.info("job started", { jobId: job.id, job: job.name, queue: job.queueName });
+    logger.info("job started", {
+      jobId: job.id,
+      job: job.name,
+      queue: job.queueName,
+    });
   });
   worker.on("completed", (job) => {
     const durationMs =
-      job.finishedOn && job.processedOn ? job.finishedOn - job.processedOn : null;
+      job.finishedOn && job.processedOn
+        ? job.finishedOn - job.processedOn
+        : null;
     logger.info("job completed", {
       jobId: job.id,
       job: job.name,

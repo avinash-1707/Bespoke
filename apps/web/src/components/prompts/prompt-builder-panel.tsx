@@ -17,7 +17,10 @@ interface PromptBuilderPanelProps {
  * Templates (one-click presets) and Builder (a structured form). Both only
  * produce an editable draft; the editor stays the source of truth.
  */
-export function PromptBuilderPanel({ onApply, onClose }: PromptBuilderPanelProps) {
+export function PromptBuilderPanel({
+  onApply,
+  onClose,
+}: PromptBuilderPanelProps) {
   return (
     <div className="flex h-full flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
@@ -39,7 +42,10 @@ export function PromptBuilderPanel({ onApply, onClose }: PromptBuilderPanelProps
         </button>
       </div>
 
-      <Tabs defaultValue="templates" className="flex min-h-0 flex-1 flex-col gap-3">
+      <Tabs
+        defaultValue="templates"
+        className="flex min-h-0 flex-1 flex-col gap-3"
+      >
         <TabsList className="w-full">
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="builder">Builder</TabsTrigger>

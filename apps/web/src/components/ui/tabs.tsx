@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { motion } from "motion/react"
-import { Tabs as TabsPrimitive } from "radix-ui"
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+import { motion } from "motion/react";
+import { Tabs as TabsPrimitive } from "radix-ui";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface IndicatorRect {
-  left: number
-  top: number
-  width: number
-  height: number
+  left: number;
+  top: number;
+  width: number;
+  height: number;
 }
 
 function Tabs({
@@ -26,11 +26,11 @@ function Tabs({
       orientation={orientation}
       className={cn(
         "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 const tabsListVariants = cva(
@@ -45,8 +45,8 @@ const tabsListVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 function TabsList({
   className,
@@ -55,46 +55,46 @@ function TabsList({
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
-  const ref = React.useRef<HTMLDivElement>(null)
-  const [rect, setRect] = React.useState<IndicatorRect | null>(null)
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [rect, setRect] = React.useState<IndicatorRect | null>(null);
 
   // Track the active trigger's box so a single shared pill can slide to it.
   // Driven off Radix's `data-state` attribute, so it works for any Tabs usage
   // without each call site wiring up an indicator.
   React.useEffect(() => {
-    const list = ref.current
-    if (!list) return
+    const list = ref.current;
+    if (!list) return;
 
     const measure = () => {
       const active = list.querySelector<HTMLElement>(
-        '[data-slot="tabs-trigger"][data-state="active"]'
-      )
+        '[data-slot="tabs-trigger"][data-state="active"]',
+      );
       if (!active) {
-        setRect(null)
-        return
+        setRect(null);
+        return;
       }
       setRect({
         left: active.offsetLeft,
         top: active.offsetTop,
         width: active.offsetWidth,
         height: active.offsetHeight,
-      })
-    }
+      });
+    };
 
-    measure()
-    const observer = new MutationObserver(measure)
+    measure();
+    const observer = new MutationObserver(measure);
     observer.observe(list, {
       attributes: true,
       subtree: true,
       attributeFilter: ["data-state"],
-    })
-    const resize = new ResizeObserver(measure)
-    resize.observe(list)
+    });
+    const resize = new ResizeObserver(measure);
+    resize.observe(list);
     return () => {
-      observer.disconnect()
-      resize.disconnect()
-    }
-  }, [])
+      observer.disconnect();
+      resize.disconnect();
+    };
+  }, []);
 
   return (
     <TabsPrimitive.List
@@ -121,7 +121,7 @@ function TabsList({
       ) : null}
       {children}
     </TabsPrimitive.List>
-  )
+  );
 }
 
 function TabsTrigger({
@@ -136,11 +136,11 @@ function TabsTrigger({
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
         "data-[state=active]:text-[var(--accent-text)]",
         "after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[orientation=horizontal]/tabs:after:bottom-[-5px] group-data-[orientation=horizontal]/tabs:after:h-0.5 group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[orientation=vertical]/tabs:after:-right-1 group-data-[orientation=vertical]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state=active]:after:opacity-100",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function TabsContent({
@@ -153,7 +153,7 @@ function TabsContent({
       className={cn("flex-1 outline-none", className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants }
+export { Tabs, TabsList, TabsTrigger, TabsContent, tabsListVariants };

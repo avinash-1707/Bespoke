@@ -49,10 +49,22 @@ export function StatCards() {
   }
 
   const stats: Stat[] = [
-    { label: "Messages", value: dashboard.data.totalMessages, icon: MessageSquare },
-    { label: "Last 30 days", value: dashboard.data.messagesLast30Days, icon: TrendingUp },
+    {
+      label: "Messages",
+      value: dashboard.data.totalMessages,
+      icon: MessageSquare,
+    },
+    {
+      label: "Last 30 days",
+      value: dashboard.data.messagesLast30Days,
+      icon: TrendingUp,
+    },
     { label: "Prospects", value: dashboard.data.prospectsCount, icon: Users },
-    { label: "Replies", value: dashboard.data.conversationsWithReplies, icon: Reply },
+    {
+      label: "Replies",
+      value: dashboard.data.conversationsWithReplies,
+      icon: Reply,
+    },
   ];
 
   return (

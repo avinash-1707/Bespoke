@@ -61,10 +61,9 @@ export const generatedMessages = pgTable(
     generationId: uuid("generation_id")
       .notNull()
       .references(() => aiGenerations.id, { onDelete: "cascade" }),
-    conversationId: uuid("conversation_id").references(
-      () => conversations.id,
-      { onDelete: "set null" },
-    ),
+    conversationId: uuid("conversation_id").references(() => conversations.id, {
+      onDelete: "set null",
+    }),
     content: text("content").notNull(),
     isFavorite: boolean("is_favorite").notNull().default(false),
     copiedCount: integer("copied_count").notNull().default(0),
@@ -77,4 +76,3 @@ export const generatedMessages = pgTable(
     index("generated_messages_conversation_id_idx").on(table.conversationId),
   ],
 );
-

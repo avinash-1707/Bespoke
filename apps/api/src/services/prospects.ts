@@ -1,15 +1,7 @@
 import { and, desc, eq, ilike, inArray, isNotNull, or, sql } from "drizzle-orm";
-import {
-  schema,
-  type Prospect,
-  type ProspectAsset,
-} from "@bespoke/db";
+import { schema, type Prospect, type ProspectAsset } from "@bespoke/db";
 import { JOB_NAME, QUEUE_NAME, enqueueJob } from "@bespoke/queue";
-import type {
-  CursorPage,
-  ListQuery,
-  ProspectAssetType,
-} from "@bespoke/shared";
+import type { CursorPage, ListQuery, ProspectAssetType } from "@bespoke/shared";
 import { db } from "../context";
 import { queues } from "../queue";
 import { clampLimit, decodeCursor, keysetBefore, toPage } from "./_cursor";
@@ -82,7 +74,12 @@ async function scrapingFlags(
   const prospectsWithCtx = await db
     .select({ id: schema.prospects.id })
     .from(schema.prospects)
-    .where(and(inArray(schema.prospects.id, prospectIds), isNotNull(schema.prospects.mergedContext)));
+    .where(
+      and(
+        inArray(schema.prospects.id, prospectIds),
+        isNotNull(schema.prospects.mergedContext),
+      ),
+    );
   const hasContext = new Set(prospectsWithCtx.map((p) => p.id));
 
   const byProspect = new Map<string, ProspectAsset["status"][]>();
@@ -195,7 +192,10 @@ export async function listProspects(
   const page = toPage(rows, limit);
   const flags = await scrapingFlags(page.items.map((p) => p.id));
   return {
-    items: page.items.map((p) => ({ ...p, scraping: flags.get(p.id) ?? false })),
+    items: page.items.map((p) => ({
+      ...p,
+      scraping: flags.get(p.id) ?? false,
+    })),
     nextCursor: page.nextCursor,
   };
 }
@@ -253,7 +253,8 @@ export async function getProspect(
     ...prospect,
     assets: assets.map((a) => ({
       ...a,
-      failureReason: a.status === "failed" ? (failureByAsset.get(a.id) ?? null) : null,
+      failureReason:
+        a.status === "failed" ? (failureByAsset.get(a.id) ?? null) : null,
     })),
     scraping,
   };

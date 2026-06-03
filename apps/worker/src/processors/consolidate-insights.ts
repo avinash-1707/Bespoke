@@ -40,12 +40,16 @@ export async function consolidateInsights(
       .where(eq(schema.prospectAssets.prospectId, prospectId));
     const assetTypeById = new Map(assets.map((a) => [a.id, a.assetType]));
 
-    const mergedContext = compileProspectContext(prospect, insights.map((row) => ({
-      assetType:
-        (row.sourceAssetId && assetTypeById.get(row.sourceAssetId)) || "other_url",
-      summary: row.summary ?? "",
-      structuredData: (row.structuredData as StructuredData | null) ?? null,
-    })));
+    const mergedContext = compileProspectContext(
+      prospect,
+      insights.map((row) => ({
+        assetType:
+          (row.sourceAssetId && assetTypeById.get(row.sourceAssetId)) ||
+          "other_url",
+        summary: row.summary ?? "",
+        structuredData: (row.structuredData as StructuredData | null) ?? null,
+      })),
+    );
 
     await db
       .update(schema.prospects)

@@ -265,7 +265,9 @@ export function OfferingCreateDialog({
             Cancel
           </Button>
           <Button onClick={submit} disabled={create.isPending || !name.trim()}>
-            {create.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {create.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : null}
             Create
           </Button>
         </DialogFooter>

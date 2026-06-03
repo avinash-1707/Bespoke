@@ -33,10 +33,7 @@ const schema = z.object({
 
 const parsed = schema.safeParse(process.env);
 if (!parsed.success) {
-  console.error(
-    "Invalid api environment:",
-    z.treeifyError(parsed.error),
-  );
+  console.error("Invalid api environment:", z.treeifyError(parsed.error));
   process.exit(1);
 }
 

@@ -18,7 +18,11 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/shared/status-badge";
 
-const FIELD_LABELS: { key: keyof UpdateOfferingInput; label: string; rows?: number }[] = [
+const FIELD_LABELS: {
+  key: keyof UpdateOfferingInput;
+  label: string;
+  rows?: number;
+}[] = [
   { key: "description", label: "Description", rows: 3 },
   { key: "targetAudience", label: "Target audience", rows: 2 },
   { key: "problemSolved", label: "Problem solved", rows: 2 },
@@ -130,7 +134,10 @@ export default function OfferingDetailPage() {
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
               />
-              <Button type="submit" disabled={addSource.isPending || !sourceUrl.trim()}>
+              <Button
+                type="submit"
+                disabled={addSource.isPending || !sourceUrl.trim()}
+              >
                 {addSource.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : null}
@@ -154,7 +161,9 @@ export default function OfferingDetailPage() {
                 ))}
               </ul>
             ) : (
-              <p className="text-xs text-[var(--text-muted)]">No sources yet.</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                No sources yet.
+              </p>
             )}
           </section>
 

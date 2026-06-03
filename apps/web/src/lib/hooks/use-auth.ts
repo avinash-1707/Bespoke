@@ -18,7 +18,10 @@ export interface SignInInput {
  * Better Auth client methods return `{ data, error }` rather than throwing.
  * Unwrap here so TanStack Query's error/success paths work as expected.
  */
-function unwrap<T>(result: { data: T | null; error: { message?: string } | null }): T {
+function unwrap<T>(result: {
+  data: T | null;
+  error: { message?: string } | null;
+}): T {
   if (result.error) {
     throw new Error(result.error.message ?? "Request failed");
   }

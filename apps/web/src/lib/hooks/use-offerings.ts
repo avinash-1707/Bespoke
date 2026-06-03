@@ -61,8 +61,7 @@ function optimisticOffering(input: CreateOfferingInput): Offering {
     proofPoints: input.proofPoints ?? null,
     compiledContext: null,
     // Any URL means a background scrape is starting — pulse immediately.
-    status:
-      input.sourceUrl || input.sourceUrls?.length ? "scraping" : "draft",
+    status: input.sourceUrl || input.sourceUrls?.length ? "scraping" : "draft",
     createdAt: now,
     updatedAt: now,
   } as Offering;
@@ -98,7 +97,8 @@ export function useOffering(id: string) {
  */
 export function useWatchOfferingScrape(offering: Offering) {
   const queryClient = useQueryClient();
-  const watching = offering.status === "scraping" && !isOptimisticId(offering.id);
+  const watching =
+    offering.status === "scraping" && !isOptimisticId(offering.id);
   const lastStatus = useRef(offering.status);
 
   const { data } = useQuery({
@@ -127,7 +127,11 @@ export function useCreateOffering() {
       apiClient.post<OfferingWithSources>("/api/offerings", input),
     onMutate: async (input): Promise<{ snapshot: ListSnapshot }> => {
       const snapshot = await snapshotLists(queryClient, offeringKeys.lists);
-      prependToLists(queryClient, offeringKeys.lists, optimisticOffering(input));
+      prependToLists(
+        queryClient,
+        offeringKeys.lists,
+        optimisticOffering(input),
+      );
       return { snapshot };
     },
     onError: (error, _input, context) => {

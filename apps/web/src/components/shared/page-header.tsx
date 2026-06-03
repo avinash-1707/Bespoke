@@ -18,7 +18,12 @@ interface PageHeaderProps {
  * with a short accent segment at the left edge — a measured, drafting-table cue
  * that gives every page the same crafted opening without extra chrome.
  */
-export function PageHeader({ title, subtitle, eyebrow, action }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  eyebrow,
+  action,
+}: PageHeaderProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -32,7 +37,9 @@ export function PageHeader({ title, subtitle, eyebrow, action }: PageHeaderProps
             {title}
           </h1>
           {subtitle ? (
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              {subtitle}
+            </p>
           ) : null}
         </div>
         {action ? <div className="shrink-0">{action}</div> : null}

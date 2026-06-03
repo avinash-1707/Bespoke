@@ -1,4 +1,13 @@
-import { and, count, countDistinct, desc, eq, gte, isNotNull, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  gte,
+  isNotNull,
+  sql,
+} from "drizzle-orm";
 import { schema } from "@bespoke/db";
 import { db } from "../context";
 
@@ -144,7 +153,12 @@ export async function getDashboard(userId: string): Promise<DashboardData> {
         schema.aiGenerations,
         eq(schema.generatedMessages.generationId, schema.aiGenerations.id),
       )
-      .where(and(eq(schema.aiGenerations.userId, userId), isNotNull(schema.generatedMessages.rating)))
+      .where(
+        and(
+          eq(schema.aiGenerations.userId, userId),
+          isNotNull(schema.generatedMessages.rating),
+        ),
+      )
       .orderBy(desc(schema.generatedMessages.rating))
       .limit(5)
       .then((rows) => rows as TopRatedMessage[]),
@@ -164,7 +178,9 @@ export async function getDashboard(userId: string): Promise<DashboardData> {
       )
       .groupBy(sql`date_trunc('day', ${schema.aiGenerations.createdAt})`)
       .orderBy(sql`date_trunc('day', ${schema.aiGenerations.createdAt})`)
-      .then((rows) => rows.map((row) => ({ date: row.date, count: row.value }))),
+      .then((rows) =>
+        rows.map((row) => ({ date: row.date, count: row.value })),
+      ),
   ]);
 
   return {

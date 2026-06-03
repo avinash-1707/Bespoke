@@ -166,7 +166,10 @@ export function EntityPicker<T>({
             placeholder={`Search ${noun}s…`}
           />
 
-          <ScrollArea className="h-72 -mx-1 px-1" viewportRef={scrollViewportRef}>
+          <ScrollArea
+            className="h-72 -mx-1 px-1"
+            viewportRef={scrollViewportRef}
+          >
             {list.isLoading ? (
               <p className="py-8 text-center text-xs text-[var(--text-muted)]">
                 Loading…

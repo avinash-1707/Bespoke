@@ -67,7 +67,6 @@ export default function ConversationThreadPage() {
       ) : (
         <>
           <div
-            data-lenis-prevent
             className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain px-0.5 pb-2"
             aria-label="Conversation messages"
           >

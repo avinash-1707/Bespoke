@@ -38,8 +38,7 @@ export const ASSET_STATUS = {
   done: "done",
   failed: "failed",
 } as const;
-export type AssetStatus =
-  (typeof ASSET_STATUS)[keyof typeof ASSET_STATUS];
+export type AssetStatus = (typeof ASSET_STATUS)[keyof typeof ASSET_STATUS];
 
 export const JOB_STATUS = {
   pending: "pending",

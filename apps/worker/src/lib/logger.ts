@@ -41,16 +41,17 @@ function write(level: Level, message: string, context?: Context): void {
  * `job` id) can be carried with `child` so every line in a job shares it.
  */
 export const logger = {
-  debug: (message: string, context?: Context) => write("debug", message, context),
+  debug: (message: string, context?: Context) =>
+    write("debug", message, context),
   info: (message: string, context?: Context) => write("info", message, context),
   warn: (message: string, context?: Context) => write("warn", message, context),
-  error: (message: string, context?: Context) => write("error", message, context),
+  error: (message: string, context?: Context) =>
+    write("error", message, context),
 
   /** Return a logger that merges `bound` into every line's context. */
   child(bound: Context) {
-    const bind =
-      (level: Level) => (message: string, context?: Context) =>
-        write(level, message, { ...bound, ...context });
+    const bind = (level: Level) => (message: string, context?: Context) =>
+      write(level, message, { ...bound, ...context });
     return {
       debug: bind("debug"),
       info: bind("info"),

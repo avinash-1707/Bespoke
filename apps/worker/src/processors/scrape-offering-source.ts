@@ -38,10 +38,10 @@ async function runExtraction(
 function hasStructuredContent(offering: ExistingOfferingFields): boolean {
   return Boolean(
     offering.description ||
-      offering.targetAudience ||
-      offering.problemSolved ||
-      offering.uniqueValueProp ||
-      offering.proofPoints,
+    offering.targetAudience ||
+    offering.problemSolved ||
+    offering.uniqueValueProp ||
+    offering.proofPoints,
   );
 }
 
@@ -93,10 +93,11 @@ export async function scrapeOfferingSource(
     const userKey = settings?.openrouterApiKeyEncrypted
       ? decryptSecret(settings.openrouterApiKeyEncrypted)
       : null;
-    const { model, slug: modelSlug, usingUserKey } = resolveModel(
-      settings?.generationModel,
-      userKey,
-    );
+    const {
+      model,
+      slug: modelSlug,
+      usingUserKey,
+    } = resolveModel(settings?.generationModel, userKey);
 
     const [offering] = await db
       .select()

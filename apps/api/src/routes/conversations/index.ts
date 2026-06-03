@@ -33,12 +33,9 @@ export async function conversationRoutes(
     }),
   );
 
-  app.get(
-    "/start-candidates",
-    async (request) => ({
-      data: await conversationsService.listStartCandidates(request.userId),
-    }),
-  );
+  app.get("/start-candidates", async (request) => ({
+    data: await conversationsService.listStartCandidates(request.userId),
+  }));
 
   app.get(
     "/:id",

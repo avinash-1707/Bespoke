@@ -41,16 +41,16 @@ contextual follow-up that continues the conversation naturally.
 
 ## Key features
 
-| Feature | What it gives you |
-|---|---|
-| **Offering management** | Scrape a URL, type manually, or combine both. Raw scraped content stays separate from your edits. Multiple offerings per account. |
-| **Prompt customization** | Save reusable system prompts: tone, length, angle, constraints. A guided Prompt Builder with templates drafts one for you. |
-| **Flexible prospect inputs** | LinkedIn screenshot, GitHub URL, personal site, company site, any URL, or free-text notes: all scraped in the background and merged into one context. |
-| **Personalized generation** | Offering + prompt + consolidated prospect context produces a message that reads like a human wrote it for that specific person. |
-| **Reply handling** | Paste a reply, get a contextual follow-up using the full thread, original offering, and prospect context: never a fresh start. |
-| **Analytics** | Generation volume, offering usage breakdown, top-rated messages, conversations with replies: all live counts from the database. |
-| **Per-user model selection** | Gemini models free on the platform key; Anthropic/OpenAI models run on the user's own encrypted OpenRouter key (AES-256-GCM at rest). |
-| **Background job pipeline** | All scraping and AI work queued via BullMQ: the API never blocks; job status is visible per asset while work runs. |
+| Feature                         | What it gives you                                                                                                                                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Offering management**         | Scrape a URL, type manually, or combine both. Raw scraped content stays separate from your edits. Multiple offerings per account.                                                                                   |
+| **Prompt customization**        | Save reusable system prompts: tone, length, angle, constraints. A guided Prompt Builder with templates drafts one for you.                                                                                          |
+| **Flexible prospect inputs**    | LinkedIn screenshot, GitHub URL, personal site, company site, any URL, or free-text notes: all scraped in the background and merged into one context.                                                               |
+| **Personalized generation**     | Offering + prompt + consolidated prospect context produces a message that reads like a human wrote it for that specific person.                                                                                     |
+| **Reply handling**              | Paste a reply, get a contextual follow-up using the full thread, original offering, and prospect context: never a fresh start.                                                                                      |
+| **Analytics**                   | Generation volume, offering usage breakdown, top-rated messages, conversations with replies: all live counts from the database.                                                                                     |
+| **Per-user model selection**    | Gemini models free on the platform key; Anthropic/OpenAI models run on the user's own encrypted OpenRouter key (AES-256-GCM at rest).                                                                               |
+| **Background job pipeline**     | All scraping and AI work queued via BullMQ: the API never blocks; job status is visible per asset while work runs.                                                                                                  |
 | **Transparent error surfacing** | Worker failure reasons (rate limit, model unavailable, scrape error) are stored in Postgres and returned in polling responses; the UI shows them inline and as toasts — no log access needed to diagnose a failure. |
 
 ---
@@ -122,27 +122,27 @@ contextual follow-up that continues the conversation naturally.
 
 Versions pinned to latest stable as of May 2026.
 
-| Layer        | Technology                                              | Version             |
-| ------------ | ------------------------------------------------------- | ------------------- |
-| Runtime      | Node.js                                                 | `24` (LTS)          |
-| Language     | TypeScript (strict)                                     | `6.0.x`             |
-| Pkg manager  | pnpm workspaces                                         | `11.x`              |
-| Monorepo     | Turborepo                                               | `2.9.x`             |
-| Frontend     | Next.js (App Router) / React                            | `16.2.x` / `19.2.x` |
-| Styling      | Tailwind CSS                                            | `4.3.x`             |
-| Components   | shadcn/ui (CLI v4, unified `radix-ui`)                  | CLI `4.x`           |
-| Icons        | lucide-react                                            | `1.17.x`            |
-| Client data  | TanStack Query                                          | `5.100.x`           |
-| Validation   | Zod                                                     | `4.4.x`             |
-| Backend      | Fastify                                                 | `5.8.x`             |
-| Database     | PostgreSQL                                              | `18.x`              |
-| ORM          | Drizzle ORM + drizzle-kit                               | `0.45.x`            |
-| Queue        | BullMQ + ioredis                                        | `5.77.x` / `5.x`    |
-| Cache/broker | Upstash Redis (TCP/ioredis)                             | server `8.x`        |
-| Auth         | Better Auth                                             | `1.6.x`             |
-| AI           | OpenRouter via Vercel AI SDK (`ai` + provider)          | `6.x` / `2.9.x`     |
-| Scraping     | Firecrawl (`@mendable/firecrawl-js`)                    | `4.22.x`            |
-| File storage | Cloudinary (`cloudinary`): backend-signed upload       | `2.x`               |
+| Layer        | Technology                                       | Version             |
+| ------------ | ------------------------------------------------ | ------------------- |
+| Runtime      | Node.js                                          | `24` (LTS)          |
+| Language     | TypeScript (strict)                              | `6.0.x`             |
+| Pkg manager  | pnpm workspaces                                  | `11.x`              |
+| Monorepo     | Turborepo                                        | `2.9.x`             |
+| Frontend     | Next.js (App Router) / React                     | `16.2.x` / `19.2.x` |
+| Styling      | Tailwind CSS                                     | `4.3.x`             |
+| Components   | shadcn/ui (CLI v4, unified `radix-ui`)           | CLI `4.x`           |
+| Icons        | lucide-react                                     | `1.17.x`            |
+| Client data  | TanStack Query                                   | `5.100.x`           |
+| Validation   | Zod                                              | `4.4.x`             |
+| Backend      | Fastify                                          | `5.8.x`             |
+| Database     | PostgreSQL                                       | `18.x`              |
+| ORM          | Drizzle ORM + drizzle-kit                        | `0.45.x`            |
+| Queue        | BullMQ + ioredis                                 | `5.77.x` / `5.x`    |
+| Cache/broker | Upstash Redis (TCP/ioredis)                      | server `8.x`        |
+| Auth         | Better Auth                                      | `1.6.x`             |
+| AI           | OpenRouter via Vercel AI SDK (`ai` + provider)   | `6.x` / `2.9.x`     |
+| Scraping     | Firecrawl (`@mendable/firecrawl-js`)             | `4.22.x`            |
+| File storage | Cloudinary (`cloudinary`): backend-signed upload | `2.x`               |
 
 ---
 
@@ -274,13 +274,13 @@ Polling endpoints surface these:
 
 ### UI feedback
 
-| Trigger | Where shown |
-|---|---|
+| Trigger                                                          | Where shown                                                                                       |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Generation worker fails (rate limit, bad key, model unavailable) | `toast.error(failureReason)` + "Try switching your API key in Settings." via `useWatchGeneration` |
-| Asset scrape worker fails | `toast.error(failureReason, { description: url })` via `useWatchProspectScrape` |
-| Failed asset on prospect detail page | Inline error text under the asset name in red |
-| Any mutation error (create, update, delete) | `toast.error(error.message)` at the callsite |
-| Zod validation rejected by API | `toast.error` with the field-level issue message |
+| Asset scrape worker fails                                        | `toast.error(failureReason, { description: url })` via `useWatchProspectScrape`                   |
+| Failed asset on prospect detail page                             | Inline error text under the asset name in red                                                     |
+| Any mutation error (create, update, delete)                      | `toast.error(error.message)` at the callsite                                                      |
+| Zod validation rejected by API                                   | `toast.error` with the field-level issue message                                                  |
 
 `useWatchGeneration` and `useWatchProspectScrape` use a `useRef`-based previous-state
 tracker to detect transitions (pending/processing → failed) rather than
@@ -360,21 +360,21 @@ All variables are declared in `.env.example`. Each app reads its own via a
 Zod-validated `config.ts`: `process.env` is never accessed directly elsewhere.
 `NEXT_PUBLIC_` is used only for values the browser needs.
 
-| Variable                | Used by          | Description                                    |
-| ----------------------- | ---------------- | ---------------------------------------------- |
-| `DATABASE_URL`          | api, worker, db  | PostgreSQL connection string                   |
-| `REDIS_URL`             | api, worker      | Upstash Redis **TCP** URL (`rediss://…`)       |
-| `BETTER_AUTH_SECRET`    | api              | Session signing secret                         |
-| `BETTER_AUTH_URL`       | api              | Auth base URL                                  |
-| `ENCRYPTION_KEY`        | api, worker      | 64 hex chars (32 bytes); encrypts stored secrets (user OpenRouter key). Must match across api + worker |
-| `OPENROUTER_API_KEY`    | worker           | Platform OpenRouter key (free models + extraction) |
-| `OPENROUTER_MODEL`      | worker           | Default extraction/generation model slug       |
-| `FIRECRAWL_API_KEY`     | worker           | Firecrawl scraping key                         |
-| `CLOUDINARY_CLOUD_NAME` | api, worker      | Cloudinary cloud name (signing + delivery URL) |
-| `CLOUDINARY_API_KEY`    | api              | Cloudinary API key (returned in the signature) |
-| `CLOUDINARY_API_SECRET` | api              | Cloudinary secret for signing: server-only    |
-| `NEXT_PUBLIC_API_URL`   | web              | Fastify API origin                             |
-| `GITHUB_TOKEN`          | worker           | *(optional)* GitHub REST API token. GitHub URLs are scraped via the GitHub API first (higher rate limits, structured data); falls back to Firecrawl on any error. Without this token the fallback always runs. |
+| Variable                | Used by         | Description                                                                                                                                                                                                    |
+| ----------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`          | api, worker, db | PostgreSQL connection string                                                                                                                                                                                   |
+| `REDIS_URL`             | api, worker     | Upstash Redis **TCP** URL (`rediss://…`)                                                                                                                                                                       |
+| `BETTER_AUTH_SECRET`    | api             | Session signing secret                                                                                                                                                                                         |
+| `BETTER_AUTH_URL`       | api             | Auth base URL                                                                                                                                                                                                  |
+| `ENCRYPTION_KEY`        | api, worker     | 64 hex chars (32 bytes); encrypts stored secrets (user OpenRouter key). Must match across api + worker                                                                                                         |
+| `OPENROUTER_API_KEY`    | worker          | Platform OpenRouter key (free models + extraction)                                                                                                                                                             |
+| `OPENROUTER_MODEL`      | worker          | Default extraction/generation model slug                                                                                                                                                                       |
+| `FIRECRAWL_API_KEY`     | worker          | Firecrawl scraping key                                                                                                                                                                                         |
+| `CLOUDINARY_CLOUD_NAME` | api, worker     | Cloudinary cloud name (signing + delivery URL)                                                                                                                                                                 |
+| `CLOUDINARY_API_KEY`    | api             | Cloudinary API key (returned in the signature)                                                                                                                                                                 |
+| `CLOUDINARY_API_SECRET` | api             | Cloudinary secret for signing: server-only                                                                                                                                                                     |
+| `NEXT_PUBLIC_API_URL`   | web             | Fastify API origin                                                                                                                                                                                             |
+| `GITHUB_TOKEN`          | worker          | _(optional)_ GitHub REST API token. GitHub URLs are scraped via the GitHub API first (higher rate limits, structured data); falls back to Firecrawl on any error. Without this token the fallback always runs. |
 
 > The Vercel AI SDK is a library: it needs no key of its own. The platform
 > `OPENROUTER_API_KEY` covers extraction and free (Gemini) generations; paid
@@ -432,6 +432,7 @@ reach the worker with a paid model and no key.
 - **Prompt:** Partnership request — ≤90 words, opens with a specific mutual fit, proposes shared upside, soft close. No jargon, no templates.
 - **Prospect inputs:** LinkedIn screenshot + company site (Kakiyo — LinkedIn automation tool)
 - **Generated message:**
+
   ```
   Hey Ayush, congrats on migrating Kakiyo's data from Appwrite to PlanetScale with zero downtime.
 
@@ -445,6 +446,7 @@ reach the worker with a paid model and no key.
 **Example 2: same prospect, different prompt** (shows prompt customization changing the angle)
 
 - **Prompt A** — Partnership request, ≤90 words, partnership framing:
+
   ```
   Hey Ayush, congrats on migrating Kakiyo's data from Appwrite to PlanetScale with zero downtime.
 
@@ -454,6 +456,7 @@ reach the worker with a paid model and no key.
 
   Open to seeing if there is a way to partner and plug this into Kakiyo?
   ```
+
 - **Prompt B** — LinkedIn note, ≤60 words, curiosity-first, lighter touch:
   ```
   Hey Ayush, how has the reception been for MemContext among the Cursor and Claude communities?
@@ -536,7 +539,7 @@ reach the worker with a paid model and no key.
     chunks by cosine similarity, and feed only those into
     `buildMessageSystemPrompt` instead of the full blob.
   - **Score hooks** so `## Recent Activity` / `## Talking Points` are selected by
-    relevance to *this* offering rather than recency alone: different offerings
+    relevance to _this_ offering rather than recency alone: different offerings
     surface different angles from the same prospect.
   - Keeps generation cost bounded as a prospect accumulates sources, and makes
     the "close context picking" deterministic and inspectable (you can log which

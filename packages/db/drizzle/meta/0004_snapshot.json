@@ -110,12 +110,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -202,12 +198,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -217,9 +209,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -283,9 +273,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -430,12 +418,8 @@
           "name": "offering_sources_offering_id_offerings_id_fk",
           "tableFrom": "offering_sources",
           "tableTo": "offerings",
-          "columnsFrom": [
-            "offering_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["offering_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -555,12 +539,8 @@
           "name": "offerings_user_id_user_id_fk",
           "tableFrom": "offerings",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -644,12 +624,8 @@
           "name": "prompts_user_id_user_id_fk",
           "tableFrom": "prompts",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -746,12 +722,8 @@
           "name": "prospect_assets_prospect_id_prospects_id_fk",
           "tableFrom": "prospect_assets",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -799,12 +771,8 @@
           "name": "prospect_context_prospect_id_prospects_id_fk",
           "tableFrom": "prospect_context",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -814,9 +782,7 @@
         "prospect_context_prospect_id_unique": {
           "name": "prospect_context_prospect_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "prospect_id"
-          ]
+          "columns": ["prospect_id"]
         }
       },
       "policies": {},
@@ -888,12 +854,8 @@
           "name": "prospect_insights_prospect_id_prospects_id_fk",
           "tableFrom": "prospect_insights",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -901,12 +863,8 @@
           "name": "prospect_insights_source_asset_id_prospect_assets_id_fk",
           "tableFrom": "prospect_insights",
           "tableTo": "prospect_assets",
-          "columnsFrom": [
-            "source_asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["source_asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1001,12 +959,8 @@
           "name": "prospects_user_id_user_id_fk",
           "tableFrom": "prospects",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1082,12 +1036,8 @@
           "name": "conversation_messages_conversation_id_conversations_id_fk",
           "tableFrom": "conversation_messages",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1171,12 +1121,8 @@
           "name": "conversations_prospect_id_prospects_id_fk",
           "tableFrom": "conversations",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1304,12 +1250,8 @@
           "name": "ai_generations_user_id_user_id_fk",
           "tableFrom": "ai_generations",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1317,12 +1259,8 @@
           "name": "ai_generations_offering_id_offerings_id_fk",
           "tableFrom": "ai_generations",
           "tableTo": "offerings",
-          "columnsFrom": [
-            "offering_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["offering_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1330,12 +1268,8 @@
           "name": "ai_generations_prompt_id_prompts_id_fk",
           "tableFrom": "ai_generations",
           "tableTo": "prompts",
-          "columnsFrom": [
-            "prompt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prompt_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1343,12 +1277,8 @@
           "name": "ai_generations_prospect_id_prospects_id_fk",
           "tableFrom": "ai_generations",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1447,12 +1377,8 @@
           "name": "generated_messages_generation_id_ai_generations_id_fk",
           "tableFrom": "generated_messages",
           "tableTo": "ai_generations",
-          "columnsFrom": [
-            "generation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["generation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1460,12 +1386,8 @@
           "name": "generated_messages_conversation_id_conversations_id_fk",
           "tableFrom": "generated_messages",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -1519,12 +1441,8 @@
           "name": "message_ratings_message_id_generated_messages_id_fk",
           "tableFrom": "message_ratings",
           "tableTo": "generated_messages",
-          "columnsFrom": [
-            "message_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["message_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1534,9 +1452,7 @@
         "message_ratings_message_id_unique": {
           "name": "message_ratings_message_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "message_id"
-          ]
+          "columns": ["message_id"]
         }
       },
       "policies": {},
@@ -1637,12 +1553,8 @@
           "name": "generation_jobs_generation_id_ai_generations_id_fk",
           "tableFrom": "generation_jobs",
           "tableTo": "ai_generations",
-          "columnsFrom": [
-            "generation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["generation_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1777,12 +1689,8 @@
           "name": "scrape_jobs_user_id_user_id_fk",
           "tableFrom": "scrape_jobs",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1790,12 +1698,8 @@
           "name": "scrape_jobs_prospect_id_prospects_id_fk",
           "tableFrom": "scrape_jobs",
           "tableTo": "prospects",
-          "columnsFrom": [
-            "prospect_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["prospect_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1803,12 +1707,8 @@
           "name": "scrape_jobs_offering_id_offerings_id_fk",
           "tableFrom": "scrape_jobs",
           "tableTo": "offerings",
-          "columnsFrom": [
-            "offering_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["offering_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1905,12 +1805,8 @@
           "name": "analytics_events_user_id_user_id_fk",
           "tableFrom": "analytics_events",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1965,12 +1861,8 @@
           "name": "user_settings_user_id_user_id_fk",
           "tableFrom": "user_settings",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1980,9 +1872,7 @@
         "user_settings_user_id_unique": {
           "name": "user_settings_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         }
       },
       "policies": {},

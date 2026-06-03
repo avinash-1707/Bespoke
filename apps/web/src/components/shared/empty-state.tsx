@@ -23,7 +23,9 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
       <Icon className="h-8 w-8 text-[var(--text-muted)]" strokeWidth={1.5} />
-      <h3 className="text-sm font-medium text-[var(--text-primary)]">{title}</h3>
+      <h3 className="text-sm font-medium text-[var(--text-primary)]">
+        {title}
+      </h3>
       <p className="max-w-xs text-xs text-[var(--text-muted)]">{description}</p>
       {action ? <div className="mt-1">{action}</div> : null}
     </div>

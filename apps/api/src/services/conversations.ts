@@ -231,10 +231,16 @@ export async function listConversations(
       eq(schema.conversations.prospectId, schema.prospects.id),
     )
     .where(and(eq(schema.prospects.userId, userId), prospectFilter, keyset))
-    .orderBy(desc(schema.conversations.createdAt), desc(schema.conversations.id))
+    .orderBy(
+      desc(schema.conversations.createdAt),
+      desc(schema.conversations.id),
+    )
     .limit(limit + 1);
 
-  const page = toPage(rows.map((r) => r.conversation), limit);
+  const page = toPage(
+    rows.map((r) => r.conversation),
+    limit,
+  );
   if (page.items.length === 0) return { items: [], nextCursor: null };
 
   const conversationIds = page.items.map((c) => c.id);
@@ -252,7 +258,9 @@ export async function listConversations(
         createdAt: schema.conversationMessages.createdAt,
       })
       .from(schema.conversationMessages)
-      .where(inArray(schema.conversationMessages.conversationId, conversationIds))
+      .where(
+        inArray(schema.conversationMessages.conversationId, conversationIds),
+      )
       .orderBy(
         schema.conversationMessages.conversationId,
         desc(schema.conversationMessages.createdAt),
@@ -263,7 +271,9 @@ export async function listConversations(
         count: count(),
       })
       .from(schema.conversationMessages)
-      .where(inArray(schema.conversationMessages.conversationId, conversationIds))
+      .where(
+        inArray(schema.conversationMessages.conversationId, conversationIds),
+      )
       .groupBy(schema.conversationMessages.conversationId),
     db
       .select({
@@ -325,15 +335,17 @@ export async function listConversations(
           })
           .from(schema.offerings)
           .where(inArray(schema.offerings.id, offeringIds))
-      : Promise.resolve([] as {
-          id: string;
-          name: string;
-          description: string | null;
-          summary: string | null;
-          targetAudience: string | null;
-          problemSolved: string | null;
-          uniqueValueProp: string | null;
-        }[]),
+      : Promise.resolve(
+          [] as {
+            id: string;
+            name: string;
+            description: string | null;
+            summary: string | null;
+            targetAudience: string | null;
+            problemSolved: string | null;
+            uniqueValueProp: string | null;
+          }[],
+        ),
     promptIds.length > 0
       ? db
           .select({
@@ -344,16 +356,22 @@ export async function listConversations(
           })
           .from(schema.prompts)
           .where(inArray(schema.prompts.id, promptIds))
-      : Promise.resolve([] as {
-          id: string;
-          name: string;
-          systemPrompt: string;
-          isDefault: boolean;
-        }[]),
+      : Promise.resolve(
+          [] as {
+            id: string;
+            name: string;
+            systemPrompt: string;
+            isDefault: boolean;
+          }[],
+        ),
   ]);
 
-  const lastMsgByConvId = new Map(lastMessages.map((m) => [m.conversationId, m]));
-  const countByConvId = new Map(messageCounts.map((c) => [c.conversationId, c.count]));
+  const lastMsgByConvId = new Map(
+    lastMessages.map((m) => [m.conversationId, m]),
+  );
+  const countByConvId = new Map(
+    messageCounts.map((c) => [c.conversationId, c.count]),
+  );
   const prospectById = new Map(prospects.map((p) => [p.id, p]));
   const offeringById = new Map(offerings.map((o) => [o.id, o]));
   const promptById = new Map(prompts.map((p) => [p.id, p]));
@@ -376,7 +394,11 @@ export async function listConversations(
           : null,
       },
       lastMessage: lastMsg
-        ? { role: lastMsg.role, content: lastMsg.content, createdAt: lastMsg.createdAt }
+        ? {
+            role: lastMsg.role,
+            content: lastMsg.content,
+            createdAt: lastMsg.createdAt,
+          }
         : null,
       messageCount: countByConvId.get(conversation.id) ?? 0,
       awaitingReply: lastMsg?.role === "prospect",
@@ -530,7 +552,10 @@ export async function addReply(
     loadThread(conversationId),
     loadParticipants(conversation.prospectId, conversation.initialMessageId),
   ]);
-  return { status: "ok", conversation: { ...conversation, messages, participants } };
+  return {
+    status: "ok",
+    conversation: { ...conversation, messages, participants },
+  };
 }
 
 export async function setStatus(

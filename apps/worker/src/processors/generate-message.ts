@@ -86,8 +86,11 @@ export async function generateMessage(
       context.mergedContext,
     );
 
-    const { model, slug: modelSlug, usingUserKey } =
-      await resolveModelForUser(userId, generation.model);
+    const {
+      model,
+      slug: modelSlug,
+      usingUserKey,
+    } = await resolveModelForUser(userId, generation.model);
     log.info("generating message", { model: modelSlug, userKey: usingUserKey });
     const startedAt = Date.now();
     const { text, usage } = await generateText({

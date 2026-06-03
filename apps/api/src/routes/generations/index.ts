@@ -59,7 +59,8 @@ export async function generationRoutes(
       }
       if (result.status === "no_context") {
         return reply.status(409).send({
-          error: "Prospect context is not ready yet — wait for assets to finish",
+          error:
+            "Prospect context is not ready yet — wait for assets to finish",
           code: "CONTEXT_NOT_READY",
         });
       }

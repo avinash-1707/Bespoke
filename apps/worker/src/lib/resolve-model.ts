@@ -1,8 +1,5 @@
 import type { LanguageModel } from "ai";
-import {
-  DEFAULT_GENERATION_MODEL,
-  isFreeModel,
-} from "@bespoke/shared";
+import { DEFAULT_GENERATION_MODEL, isFreeModel } from "@bespoke/shared";
 import { config } from "../config";
 import { modelFor, modelForUser } from "./ai";
 import { getUserOpenRouterKey } from "./user-key";

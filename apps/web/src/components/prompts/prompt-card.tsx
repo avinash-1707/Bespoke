@@ -49,7 +49,11 @@ export function PromptCard({ prompt, options }: PromptCardProps) {
         </p>
       </EntityCard>
 
-      <PromptDialog open={editOpen} onOpenChange={setEditOpen} prompt={prompt} />
+      <PromptDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        prompt={prompt}
+      />
     </>
   );
 }

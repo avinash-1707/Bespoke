@@ -13,13 +13,22 @@ export function LandingFooter() {
         </div>
 
         <nav className="flex items-center gap-6 text-sm text-[var(--lp-text-soft)]">
-          <a href="#how-it-works" className="transition-colors duration-200 hover:text-[var(--lp-text)]">
+          <a
+            href="#how-it-works"
+            className="transition-colors duration-200 hover:text-[var(--lp-text)]"
+          >
             How it works
           </a>
-          <a href="#craft" className="transition-colors duration-200 hover:text-[var(--lp-text)]">
+          <a
+            href="#craft"
+            className="transition-colors duration-200 hover:text-[var(--lp-text)]"
+          >
             Craft
           </a>
-          <Link href="/sign-in" className="transition-colors duration-200 hover:text-[var(--lp-text)]">
+          <Link
+            href="/sign-in"
+            className="transition-colors duration-200 hover:text-[var(--lp-text)]"
+          >
             Sign in
           </Link>
         </nav>

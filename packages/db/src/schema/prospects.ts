@@ -78,4 +78,3 @@ export const prospectInsights = pgTable(
   },
   (table) => [index("prospect_insights_prospect_id_idx").on(table.prospectId)],
 );
-

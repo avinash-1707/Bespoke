@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-} from "react";
+import { useState, type FormEvent, type KeyboardEvent } from "react";
 import { ArrowUp } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -56,9 +52,7 @@ export function ChatComposer({
         disabled={disabled}
         rows={1}
         placeholder={
-          disabled
-            ? "Generating follow-up…"
-            : "Paste the prospect's reply…"
+          disabled ? "Generating follow-up…" : "Paste the prospect's reply…"
         }
         className="max-h-40 min-h-11 resize-none border-0 bg-transparent pr-12 shadow-none focus-visible:ring-0 disabled:opacity-60"
       />

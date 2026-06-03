@@ -33,7 +33,5 @@ const STATUS_TONE: Record<string, Tone> = {
 
 export function StatusBadge({ status }: { status: string }) {
   const tone = STATUS_TONE[status] ?? "muted";
-  return (
-    <Badge className={cn("capitalize", TONE_CLASS[tone])}>{status}</Badge>
-  );
+  return <Badge className={cn("capitalize", TONE_CLASS[tone])}>{status}</Badge>;
 }

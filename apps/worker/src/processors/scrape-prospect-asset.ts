@@ -140,10 +140,11 @@ export async function scrapeProspectAsset(
     const userKey = settings?.openrouterApiKeyEncrypted
       ? decryptSecret(settings.openrouterApiKeyEncrypted)
       : null;
-    const { model, slug: modelSlug, usingUserKey } = resolveModel(
-      settings?.generationModel,
-      userKey,
-    );
+    const {
+      model,
+      slug: modelSlug,
+      usingUserKey,
+    } = resolveModel(settings?.generationModel, userKey);
 
     log.info("extracting asset", {
       assetType: asset.assetType,

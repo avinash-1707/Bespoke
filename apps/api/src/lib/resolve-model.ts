@@ -1,8 +1,5 @@
 import type { LanguageModel } from "ai";
-import {
-  DEFAULT_GENERATION_MODEL,
-  isFreeModel,
-} from "@bespoke/shared";
+import { DEFAULT_GENERATION_MODEL, isFreeModel } from "@bespoke/shared";
 import { config } from "../config";
 import { getUserOpenRouterKey } from "../services/settings";
 import { modelFor, modelForUser } from "./ai";
@@ -23,9 +20,7 @@ export function resolveModel(
   const resolvedSlug =
     !isFreeModel(stored) && !userKey ? DEFAULT_GENERATION_MODEL : stored;
 
-  return userKey
-    ? modelForUser(resolvedSlug, userKey)
-    : modelFor(resolvedSlug);
+  return userKey ? modelForUser(resolvedSlug, userKey) : modelFor(resolvedSlug);
 }
 
 /**

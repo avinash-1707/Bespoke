@@ -2,7 +2,12 @@
 
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { AlertCircle, CheckSquare, Loader2, type LucideIcon } from "lucide-react";
+import {
+  AlertCircle,
+  CheckSquare,
+  Loader2,
+  type LucideIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { EmptyState } from "./empty-state";
@@ -170,7 +175,10 @@ export function InfiniteList<T>({
         <ListSkeleton />
       ) : isError ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
-          <AlertCircle className="h-8 w-8 text-[var(--state-error)]" strokeWidth={1.5} />
+          <AlertCircle
+            className="h-8 w-8 text-[var(--state-error)]"
+            strokeWidth={1.5}
+          />
           <p className="text-sm text-[var(--text-primary)]">
             {errorMessage ?? "Something went wrong loading this list."}
           </p>

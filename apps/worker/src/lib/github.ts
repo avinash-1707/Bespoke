@@ -158,7 +158,10 @@ async function fetchRepoMarkdown(owner: string, repo: string): Promise<string> {
   // README is best-effort: a repo without one shouldn't fail the fetch.
   try {
     const readme = await (
-      await ghFetch(`/repos/${owner}/${repo}/readme`, "application/vnd.github.raw")
+      await ghFetch(
+        `/repos/${owner}/${repo}/readme`,
+        "application/vnd.github.raw",
+      )
     ).text();
     const trimmed = readme.trim();
     if (trimmed) {

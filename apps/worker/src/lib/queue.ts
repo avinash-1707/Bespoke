@@ -1,4 +1,8 @@
-import { createQueues, createRedisConnection, type Queues } from "@bespoke/queue";
+import {
+  createQueues,
+  createRedisConnection,
+  type Queues,
+} from "@bespoke/queue";
 import { config } from "../config";
 
 /**

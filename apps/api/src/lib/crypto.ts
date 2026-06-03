@@ -32,7 +32,11 @@ export function decryptSecret(payload: string): string {
   if (!ivB64 || !tagB64 || !cipherB64) {
     throw new Error("Malformed encrypted secret");
   }
-  const decipher = createDecipheriv(ALGORITHM, KEY, Buffer.from(ivB64, "base64"));
+  const decipher = createDecipheriv(
+    ALGORITHM,
+    KEY,
+    Buffer.from(ivB64, "base64"),
+  );
   decipher.setAuthTag(Buffer.from(tagB64, "base64"));
   return Buffer.concat([
     decipher.update(Buffer.from(cipherB64, "base64")),

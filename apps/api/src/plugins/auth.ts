@@ -23,10 +23,7 @@ declare module "fastify" {
 export const authPlugin = fp(async (fastify) => {
   // Reserve the request properties; real values are set by `requireAuth`.
   fastify.decorateRequest("userId", "");
-  fastify.decorateRequest(
-    "session",
-    null as unknown as NonNullable<Session>,
-  );
+  fastify.decorateRequest("session", null as unknown as NonNullable<Session>);
 
   fastify.route({
     method: ["GET", "POST"],

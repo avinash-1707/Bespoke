@@ -37,7 +37,11 @@ export function BrandLogo({ className, size = 32 }: BrandLogoProps) {
         {/* needle shaft / seam */}
         <path d="M5 19 L19 5" />
         {/* thread knot pulled through at the start of the stitch */}
-        <path d="M5 19 l4.6 -1 -3.6 -3.6 -1 4.6" fill="currentColor" stroke="none" />
+        <path
+          d="M5 19 l4.6 -1 -3.6 -3.6 -1 4.6"
+          fill="currentColor"
+          stroke="none"
+        />
         {/* needle eye */}
         <circle cx="17.5" cy="6.5" r="1.5" />
       </svg>
